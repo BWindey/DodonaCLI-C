@@ -8,11 +8,11 @@ As long as this version isn't somewhat feature-complete, I'll never recommend it
 
 
 ## To Do:
-[ ] All the subcommands without functionality (so parse command-line args)
-[ ] Implement subcommands that don't make an API-request
-[ ] Implement https requests
-[ ] Implement json (use library?)
-[ ] Create some abstraction layer around API (maybe some level of caching)
-[ ] Implement subcommands who rely on the API
-[ ] Create some library for displaying rich text (colours, bold, italic, ...)
+- [ ] All the subcommands without functionality (so parse command-line args)
+- [ ] Implement subcommands that don't make an API-request
+- [ ] Implement https requests
+- [ ] Implement json (use library?)
+- [ ] Create some abstraction layer around API (maybe some level of caching)
+- [ ] Implement subcommands who rely on the API
+- [ ] Create some library for displaying rich text (colours, bold, italic, ...)
 
