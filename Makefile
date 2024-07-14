@@ -1,29 +1,41 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11
+SRCDIR = .
+SUBCMDIR = $(SRCDIR)/subcommands
+OBJDIR = $(SRCDIR)/obj
 
-OBJ = arguments.o subcommands/info.o
+SRC = $(SRCDIR)/arguments.c \
+      $(SUBCMDIR)/display.c \
+      $(SUBCMDIR)/info.c \
+      $(SUBCMDIR)/next.c \
+      $(SUBCMDIR)/post.c \
+      $(SUBCMDIR)/select.c \
+      $(SUBCMDIR)/settings.c \
+      $(SUBCMDIR)/status.c \
+      $(SUBCMDIR)/sub.c \
+      $(SUBCMDIR)/tutorial.c \
+      $(SUBCMDIR)/up.c
+
+OBJ = $(SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 EXEC = dodc
 
 # Default target
-all : $(EXEC)
+all: $(EXEC)
 
 # Link object files together
 $(EXEC): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(EXEC)
 
-# Compile main
-arguments.o: arguments.c arguments.h subcommands/info.h
-	$(CC) $(CFLAGS) -c arguments.c -o arguments.o
-
-# Compile subcommands
-subcommands/info.o: subcommands/info.c subcommands/info.h
-	$(CC) $(CFLAGS) -c subcommands/info.c -o subcommands/info.o
-
+# Pattern rule for object files
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # Clean up
 clean:
 	rm -f $(OBJ) $(EXEC)
+	rm -rf $(OBJDIR)
 
 # Avoid confusion with actual files called "all" or "clean"
 .PHONY: all clean
