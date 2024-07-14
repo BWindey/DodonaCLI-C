@@ -1,11 +1,11 @@
 #include <stdio.h>
 
-#include "select.h"
+#include "next.h"
 
 
-void info(int argc, const char* argv[]) {
-    printf("Hello from select\n\n");
-    printf("Found %d arguments for select-subcommand:\n", argc - 1);
+void next(int argc, const char* argv[]) {
+    printf("Hello from next\n\n");
+    printf("Found %d arguments for next-subcommand:\n", argc - 1);
     for (int i = 0; i < argc; i++) {
         printf("%s, ", argv[i]);
     }
