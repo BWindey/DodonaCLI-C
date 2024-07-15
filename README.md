@@ -10,7 +10,7 @@ As long as this version isn't somewhat feature-complete, I'll never recommend it
 ## To Do:
 - [ ] All the subcommands:
     - [ ] Display (API)
-    - [ ] Info: --help, version, completion, github, changelog, man-page
+    - [X] Info: --help, version, completion, github, changelog, man-page
     - [ ] Next (API)
     - [ ] Post: selected exerc, link top file (API)
     - [ ] Settings (low priority)
