@@ -1,18 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-#include "arguments.h"
-#include "subcommands/display.h"
-#include "subcommands/info.h"
-#include "subcommands/next.h"
-#include "subcommands/post.h"
-#include "subcommands/select.h"
-#include "subcommands/settings.h"
-#include "subcommands/status.h"
-#include "subcommands/sub.h"
-#include "subcommands/tutorial.h"
-#include "subcommands/up.h"
+#include "main.h"
 
 
 int main(int argc, const char* argv[]) {
@@ -23,14 +9,33 @@ int main(int argc, const char* argv[]) {
 
 
 void handleArgs(int argc, const char* argv[]) {
-    printf("Found %d arguments.\n\n", argc - 1);
+    const char USAGE_MAIN[] = "Usage: dodona [OPTIONS] COMMAND [ARGS]...\n";
+    const char HELP_MAIN[] =
+        "\n"
+        "  A 3rd party Command Line Interface for Dodona. Finally you have no need to\n"
+        "  exit your terminal anymore! Use --help for more info about flags, or read\n"
+        "  the README on discord.\n"
+        "\n"
+        "Options:\n"
+        "  --help  Show this message and exit.\n"
+        "\n"
+        "Commands:\n"
+        "  display   Display info based on the current selection.\n"
+        "  info      Info about shell-completion, changelog, version,...\n"
+        "  next      WARNING: might overwrite 'boilerplate' file! Move to the next...\n"
+        "  post      Post a solution-file to Dodona.\n"
+        "  select    Select based on id or name.\n"
+        "  settings  Interactive settings-menu to change some settings\n"
+        "  status    Display your current selection.\n"
+        "  sub       Get submission data.\n"
+        "  tutorial  Start tutorial\n"
+        "  up        Deselect default last selected thing.\n";
 
     const char* first_arg = argv[1];
 
     // Check for --help flag and then handle subcommands
     if (argc <= 1 || strcmp(first_arg, "--help") == 0 || strcmp(first_arg, "-h") == 0) {
-        printf(HELP);
-
+        printf("%s%s", USAGE_MAIN, HELP_MAIN);
         return;
 
     } else if (strcmp(first_arg, "display") == 0) {
@@ -64,7 +69,7 @@ void handleArgs(int argc, const char* argv[]) {
         up(argc - 1, &argv[1]);
 
     } else {
-        printf("Usage: dodona [OPTIONS] COMMAND [ARGS]...\nUse '--help' for more info.\n");
+        printf("%s\nUse '--help' for more info.\n", USAGE_MAIN);
         exit(1);
     }
 }

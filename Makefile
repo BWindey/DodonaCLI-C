@@ -4,7 +4,7 @@ SRCDIR = .
 SUBCMDIR = $(SRCDIR)/subcommands
 OBJDIR = $(SRCDIR)/obj
 
-SRC = $(SRCDIR)/arguments.c \
+SRC = $(SRCDIR)/main.c \
       $(SUBCMDIR)/display.c \
       $(SUBCMDIR)/info.c \
       $(SUBCMDIR)/next.c \
