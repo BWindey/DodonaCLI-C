@@ -2,6 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -std=c11
 SRCDIR = .
 SUBCMDIR = $(SRCDIR)/subcommands
+LIBDIR = $(SRCDIR)/libraries
 OBJDIR = $(SRCDIR)/obj
 
 SRC = $(SRCDIR)/main.c \
@@ -14,7 +15,8 @@ SRC = $(SRCDIR)/main.c \
       $(SUBCMDIR)/status.c \
       $(SUBCMDIR)/sub.c \
       $(SUBCMDIR)/tutorial.c \
-      $(SUBCMDIR)/up.c
+      $(SUBCMDIR)/up.c \
+      $(LIBDIR)/cJSON/cJSON.c
 
 OBJ = $(SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
