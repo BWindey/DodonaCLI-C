@@ -8,9 +8,10 @@
 #define MIN_PATTERN_LENGTH 3
 #define SUPPORTED_KEYWORDS 25
 
+// #define DEBUG
 
 int main() {
-    char msg[] = "This is a [[test]] to see if everything works.";
+    char msg[] = "Let's [GREEN]get the escaped[/] [[ working!";
 
     printf("Original msg:\n | %s\n", msg);
     enrich(msg);
@@ -20,6 +21,7 @@ int main() {
 }
 
 void enrich(char* msg) {
+    char beenOpened = 'F';
     unsigned int msgLength = strlen(msg);
 
     // pOri will be used for the iteration,
@@ -62,35 +64,52 @@ void enrich(char* msg) {
         // If '[' encountered, see if it is a pattern we need to replace
         if (pOri + MIN_PATTERN_LENGTH < msgLength && msg[pOri] == '[') {
 
-            // Find closing ']'
-            unsigned int j = pOri + 1;
-            while (msg[j] != '\0' && msg[j] != ']') {
-                j++;
-            }
-            // Enforce closing the brackets
-            assert(j != msgLength);
+            int keyword;
+            if (msg[pOri + 1] == '[') {
+                // Escaped '['
+                keyword = SUPPORTED_KEYWORDS;
 
-            // Extract substring
-            char substring[j - pOri];
-            strncpy(substring, msg + pOri + 1, j - pOri - 1);
-            substring[j - pOri - 1] = '\0';
+            } else {
+                // Find closing ']'
+                unsigned int j = pOri + 1;
+                while (msg[j] != '\0' && msg[j] != ']') {
+                    j++;
+                }
+                // Enforce closing the brackets
+                assert(j != msgLength);
 
-            int keyword = 0;
-            while (strcmp(substring, actions[keyword]) != 0 && keyword < SUPPORTED_KEYWORDS) {
-                keyword++;
+                // Extract substring
+                char substring[j - pOri];
+                strncpy(substring, msg + pOri + 1, j - pOri - 1);
+                substring[j - pOri - 1] = '\0';
+
+                #ifdef DEBUG
+                printf("Found keyword: %s\n", substring);
+                #endif
+
+                keyword = 0;
+                while (strcmp(substring, actions[keyword]) != 0 && keyword < SUPPORTED_KEYWORDS) {
+                    keyword++;
+                }
+                // Enforce valid keyword
+                assert(strcmp(substring, actions[keyword]) == 0);
+
             }
-            // Enforce valid keyword
-            assert(strcmp(substring, actions[keyword]) == 0);
 
             switch (keyword) {
+                case SUPPORTED_KEYWORDS:
+                    // [[
+                    pOri++;
+                    msg[pNew] = msg[pOri];
+                    break;
+
                 case 0:
                     // [/]: 0
+                    assert(beenOpened == 'T');
                     strncpy(msg + pNew, "\e[0m", 4);
                     pOri += 2;
                     pNew += 3;
-                    // Check if new pointer still is behind,
-                    // aka there has been a replacement already
-                    assert(pNew <= pOri);
+                    beenOpened = 'F';
                     break;
 
                 case 16:
@@ -98,6 +117,7 @@ void enrich(char* msg) {
                     strncpy(msg + pNew, "\e[32m", 5);
                     pOri += 6;
                     pNew += 4;
+                    beenOpened = 'T';
                     break;
 
                 default:
@@ -110,6 +130,10 @@ void enrich(char* msg) {
 
         pNew++;
         pOri++;
+
+        #ifdef DEBUG
+        printf("After loop: '%s'\e[0m\n", msg);
+        #endif
     }
 
     if (pOri > pNew) {
