@@ -6,12 +6,12 @@
 
 // [/] is smallest pattern to search for, next smallest is [RED]
 #define MIN_PATTERN_LENGTH 3
-#define SUPPORTED_KEYWORDS 25
+#define SUPPORTED_KEYWORDS 30
 
 // #define DEBUG
 
 int main() {
-    char msg[] = "Let's [GREEN]get the escaped[/] [[ working!";
+    char msg[] = "Escaped [[, [BOLD]bold[/], [ITALIC]italic[/], [UNDER]under[/], [STRIKE]strike[/], [DIM]dim[/], [ITALIC][UNDER]it-und[/]";
 
     printf("Original msg:\n | %s\n", msg);
     enrich(msg);
@@ -39,22 +39,28 @@ void enrich(char* msg) {
         "STRIKE",
         "DIM",
         "black",
+        "Black",
         "BLACK",
         "blue",
+        "Blue",
         "BLUE",
         "cyan",
+        "Cyan",
         "CYAN",
-        "default",
-        "DEFAULT",
         "green",
+        "Green",
         "GREEN",
         "magenta",
+        "Magenta",
         "MAGENTA",
         "red",
+        "Red",
         "RED",
         "white",
+        "White",
         "WHITE",
         "yellow",
+        "Yellow",
         "YELLOW"
     };
 
@@ -62,7 +68,7 @@ void enrich(char* msg) {
     while (msg[pOri] != '\0') {
 
         // If '[' encountered, see if it is a pattern we need to replace
-        if (pOri + MIN_PATTERN_LENGTH < msgLength && msg[pOri] == '[') {
+        if (pOri + MIN_PATTERN_LENGTH <= msgLength && msg[pOri] == '[') {
 
             int keyword;
             if (msg[pOri + 1] == '[') {
@@ -84,7 +90,7 @@ void enrich(char* msg) {
                 substring[j - pOri - 1] = '\0';
 
                 #ifdef DEBUG
-                printf("Found keyword: %s\n", substring);
+                printf("\nFound keyword: %s\n", substring);
                 #endif
 
                 keyword = 0;
@@ -112,7 +118,63 @@ void enrich(char* msg) {
                     beenOpened = 'F';
                     break;
 
-                case 16:
+                case 1:
+                    // [NUMBER]: 1;32
+                    strncpy(msg + pNew, "\e[1;36m", 7);
+                    pOri += 7;
+                    pNew += 6;
+                    beenOpened = 'T';
+                    break;
+
+                case 2:
+                    // [BOLD]: 1
+                    strncpy(msg + pNew, "\e[1m", 4);
+                    pOri += 5;
+                    pNew += 3;
+                    beenOpened = 'T';
+                    break;
+
+                case 3:
+                    // [ITALIC]: 3
+                    strncpy(msg + pNew, "\e[3m", 4);
+                    pOri += 7;
+                    pNew += 3;
+                    beenOpened = 'T';
+                    break;
+
+                case 4:
+                    // [UNDER]: 4
+                    strncpy(msg + pNew, "\e[4m", 4);
+                    pOri += 6;
+                    pNew += 3;
+                    beenOpened = 'T';
+                    break;
+
+                case 5:
+                    // [STRIKE]: 9
+                    strncpy(msg + pNew, "\e[9m", 4);
+                    pOri += 7;
+                    pNew += 3;
+                    beenOpened = 'T';
+                    break;
+
+                case 6:
+                    // [DIM]: 2
+                    strncpy(msg + pNew, "\e[2m", 4);
+                    pOri += 4;
+                    pNew += 3;
+                    beenOpened = 'T';
+                    break;
+
+                case 7:
+                    // [black]: 30
+                    strncpy(msg + pNew, "\e[30m", 5);
+                    pOri += 6;
+                    pNew += 4;
+                    beenOpened = 'T';
+                    break;
+
+                case 17:
                     // [GREEN]: 32
                     strncpy(msg + pNew, "\e[32m", 5);
                     pOri += 6;
@@ -132,11 +194,18 @@ void enrich(char* msg) {
         pOri++;
 
         #ifdef DEBUG
-        printf("After loop: '%s'\e[0m\n", msg);
+        printf("After %i/%i: '%s'\e[0m\n", pOri, msgLength, msg);
         #endif
     }
 
     if (pOri > pNew) {
         msg[pNew] = '\0';
     }
+
+#ifdef DEBUG
+    printf("After loop: %s\e[0m\n\n", msg);
+#endif
+
+    // Enforce closed
+    assert(beenOpened == 'F');
 }
