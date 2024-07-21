@@ -6,12 +6,12 @@
 
 // [/] is smallest pattern to search for, next smallest is [RED]
 #define MIN_PATTERN_LENGTH 3
-#define SUPPORTED_KEYWORDS 30
+#define SUPPORTED_KEYWORDS 38
 
 // #define DEBUG
 
 int main() {
-    char msg[] = "Escaped [[, [BOLD]bold[/], [ITALIC]italic[/], [UNDER]under[/], [STRIKE]strike[/], [DIM]dim[/], [ITALIC][UNDER]it-und[/]";
+    char msg[] = "[GREEN]groen?[/] hopelijk";
 
     printf("Original msg:\n | %s\n", msg);
     enrich(msg);
@@ -21,7 +21,7 @@ int main() {
 }
 
 void enrich(char* msg) {
-    char beenOpened = 'F';
+    char currentlyOpen = 'F';
     unsigned int msgLength = strlen(msg);
 
     // pOri will be used for the iteration,
@@ -38,30 +38,38 @@ void enrich(char* msg) {
         "UNDER",
         "STRIKE",
         "DIM",
-        "black",
-        "Black",
         "BLACK",
-        "blue",
-        "Blue",
-        "BLUE",
-        "cyan",
-        "Cyan",
-        "CYAN",
-        "green",
-        "Green",
-        "GREEN",
-        "magenta",
-        "Magenta",
-        "MAGENTA",
-        "red",
-        "Red",
+        "BRIGHT-BLACK",
+        "ON BLACK",
+        "ON BRIGHT-BLACK",
         "RED",
-        "white",
-        "White",
-        "WHITE",
-        "yellow",
-        "Yellow",
+        "BRIGHT-RED",
+        "ON RED",
+        "ON BRIGHT-RED",
+        "GREEN",
+        "BRIGHT-GREEN",
+        "ON GREEN",
+        "ON BRIGHT-GREEN",
         "YELLOW"
+        "BRIGHT-YELLOW"
+        "ON YELLOW"
+        "ON BRIGHT-YELLOW"
+        "BLUE",
+        "BRIGHT-BLUE",
+        "ON BLUE",
+        "ON BRIGHT-BLUE",
+        "MAGENTA",
+        "BRIGHT-MAGENTA",
+        "ON MAGENTA",
+        "ON BRIGHT-MAGENTA",
+        "CYAN",
+        "BRIGHT-CYAN",
+        "ON CYAN",
+        "ON BRIGHT-CYAN",
+        "WHITE",
+        "BRIGHT-WHITE",
+        "ON WHITE",
+        "ON BRIGHT-WHITE",
     };
 
     // Iterate over msg-string
@@ -111,11 +119,11 @@ void enrich(char* msg) {
 
                 case 0:
                     // [/]: 0
-                    assert(beenOpened == 'T');
+                    assert(currentlyOpen == 'T');
                     strncpy(msg + pNew, "\e[0m", 4);
                     pOri += 2;
                     pNew += 3;
-                    beenOpened = 'F';
+                    currentlyOpen = 'F';
                     break;
 
                 case 1:
@@ -123,7 +131,7 @@ void enrich(char* msg) {
                     strncpy(msg + pNew, "\e[1;36m", 7);
                     pOri += 7;
                     pNew += 6;
-                    beenOpened = 'T';
+                    currentlyOpen = 'T';
                     break;
 
                 case 2:
@@ -131,7 +139,7 @@ void enrich(char* msg) {
                     strncpy(msg + pNew, "\e[1m", 4);
                     pOri += 5;
                     pNew += 3;
-                    beenOpened = 'T';
+                    currentlyOpen = 'T';
                     break;
 
                 case 3:
@@ -139,7 +147,7 @@ void enrich(char* msg) {
                     strncpy(msg + pNew, "\e[3m", 4);
                     pOri += 7;
                     pNew += 3;
-                    beenOpened = 'T';
+                    currentlyOpen = 'T';
                     break;
 
                 case 4:
@@ -147,7 +155,7 @@ void enrich(char* msg) {
                     strncpy(msg + pNew, "\e[4m", 4);
                     pOri += 6;
                     pNew += 3;
-                    beenOpened = 'T';
+                    currentlyOpen = 'T';
                     break;
 
                 case 5:
@@ -155,7 +163,7 @@ void enrich(char* msg) {
                     strncpy(msg + pNew, "\e[9m", 4);
                     pOri += 7;
                     pNew += 3;
-                    beenOpened = 'T';
+                    currentlyOpen = 'T';
                     break;
 
                 case 6:
@@ -163,7 +171,7 @@ void enrich(char* msg) {
                     strncpy(msg + pNew, "\e[2m", 4);
                     pOri += 4;
                     pNew += 3;
-                    beenOpened = 'T';
+                    currentlyOpen = 'T';
                     break;
 
                 case 7:
@@ -171,15 +179,15 @@ void enrich(char* msg) {
                     strncpy(msg + pNew, "\e[30m", 5);
                     pOri += 6;
                     pNew += 4;
-                    beenOpened = 'T';
+                    currentlyOpen = 'T';
                     break;
 
-                case 17:
+                case 18:
                     // [GREEN]: 32
                     strncpy(msg + pNew, "\e[32m", 5);
                     pOri += 6;
                     pNew += 4;
-                    beenOpened = 'T';
+                    currentlyOpen = 'T';
                     break;
 
                 default:
@@ -207,5 +215,5 @@ void enrich(char* msg) {
 #endif
 
     // Enforce closed
-    assert(beenOpened == 'F');
+    assert(currentlyOpen == 'F');
 }
