@@ -4,20 +4,17 @@
 
 #include "prettySTDout.h"
 
-// [/] is smallest pattern to escape, next smallest is [RED]
+// [/] is smallest pattern to search for, next smallest is [RED]
 #define MIN_PATTERN_LENGTH 3
-// 24 different effects possible
 #define SUPPORTED_KEYWORDS 25
 
 
 int main() {
-    char msg[] = "Hello, [GREEN]World[/]!";
+    char msg[] = "This is a [[test]] to see if everything works.";
 
-    printf("Original msg:\n%s\n\n", msg);
-
+    printf("Original msg:\n | %s\n", msg);
     enrich(msg);
-
-    printf("Enriched msg:\n%s\n", msg);
+    printf("Enriched msg:\n | %s\n", msg);
 
     return 0;
 }
@@ -65,11 +62,6 @@ void enrich(char* msg) {
         // If '[' encountered, see if it is a pattern we need to replace
         if (pOri + MIN_PATTERN_LENGTH < msgLength && msg[pOri] == '[') {
 
-            // If it's escaped using another '[', ignore this
-            if (msg[pOri + 1] == '[') {
-                pOri++;
-            }
-
             // Find closing ']'
             unsigned int j = pOri + 1;
             while (msg[j] != '\0' && msg[j] != ']') {
@@ -79,9 +71,9 @@ void enrich(char* msg) {
             assert(j != msgLength);
 
             // Extract substring
-            char substring[j - pOri - 1];
+            char substring[j - pOri];
             strncpy(substring, msg + pOri + 1, j - pOri - 1);
-            printf("Found substring: %s\n", substring);
+            substring[j - pOri - 1] = '\0';
 
             int keyword = 0;
             while (strcmp(substring, actions[keyword]) != 0 && keyword < SUPPORTED_KEYWORDS) {
@@ -89,7 +81,6 @@ void enrich(char* msg) {
             }
             // Enforce valid keyword
             assert(strcmp(substring, actions[keyword]) == 0);
-            printf("Keyword found on position: %i\n", keyword);
 
             switch (keyword) {
                 case 0:
@@ -107,7 +98,6 @@ void enrich(char* msg) {
                     strncpy(msg + pNew, "\e[32m", 5);
                     pOri += 6;
                     pNew += 4;
-                    printf("Substituted version: %s\n\e[0m", msg);
                     break;
 
                 default:
@@ -115,7 +105,6 @@ void enrich(char* msg) {
             }
         } else if (pOri > pNew) {
             msg[pNew] = msg[pOri];
-            printf("Substituted version: %s\n\e[0m", msg);
         }
 
 
