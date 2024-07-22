@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "prettySTDout.h"
+#include "enrich.h"
 
 // [/] is smallest pattern to search for, next smallest is [RED]
 #define MIN_PATTERN_LENGTH 3
@@ -90,8 +90,8 @@ void enrich(char* msg) {
         {"ON BLACK",        "\e[40m",   10, 5},
         {"ON BRIGHT-BLACK", "\e[100m",  17, 6},
         {"RED",             "\e[31m",   5,  5},
-        {"BRIGHT-RED",      "\e[41m",   12, 5},
-        {"ON RED",          "\e[91m",   8,  5},
+        {"BRIGHT-RED",      "\e[91m",   12, 5},
+        {"ON RED",          "\e[41m",   8,  5},
         {"ON BRIGHT-RED",   "\e[101m",  15, 6},
         {"GREEN",           "\e[32m",   7,  5},
         {"BRIGHT-GREEN",    "\e[92m",   14, 5},
