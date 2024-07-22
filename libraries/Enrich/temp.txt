@@ -1,0 +1,52 @@
+Number => \e[1;36m ... \e[0m
+
+ESC Code Sequence 	Reset Sequence 	Description
+---------------------------------------------------
+\e[0m   		reset all modes (styles and colors)
+\e[1m       \e[22m 	set bold mode.
+\e[2m       \e[22m 	set dim/faint mode.
+\e[3m       \e[23m 	set italic mode.
+\e[4m       \e[24m 	set underline mode.
+\e[5m       \e[25m 	set blinking mode
+\e[7m       \e[27m 	set inverse/reverse mode
+\e[8m       \e[28m 	set hidden/invisible mode
+\e[9m       \e[29m 	set strikethrough mode.
+
+
+Color       Fore    Back
+------------------------
+Black 	    30 	    40
+Red 	    31 	    41
+Green 	    32 	    42
+Yellow 	    33 	    43
+Blue 	    34 	    44
+Magenta     35 	    45
+Cyan 	    36 	    46
+White 	    37 	    47
+Default     39 	    49
+Reset 	    0 	    0
+
+"NUMBER",
+"BOLD",
+"ITALIC",
+"UNDER",
+"STRIKE",
+"DIM",
+"black",
+"BLACK",
+"blue",
+"BLUE",
+"cyan",
+"CYAN",
+"default",
+"DEFAULT",
+"green",
+"GREEN",
+"magenta",
+"MAGENTA",
+"red",
+"RED",
+"white",
+"WHITE",
+"yellow",
+"YELLOW",
