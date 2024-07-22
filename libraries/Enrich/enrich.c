@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "enrich.h"
@@ -68,6 +69,9 @@ int main() {
 }
 
 void enrich(char* msg) {
+    char* noColorTemp = getenv("NO_COLOR");
+    char noColor = (noColorTemp == NULL || strlen(noColorTemp) == 0) ? 'F' : 'T';
+
     char currentlyOpen = 'F';
     unsigned int msgLength = strlen(msg);
 
@@ -151,7 +155,7 @@ void enrich(char* msg) {
 
                 // Check if valid, and which, keyword
                 keyword = 0;
-                while (strcmp(substring, patterns[keyword].pattern) != 0 && keyword < SUPPORTED_KEYWORDS * 4) {
+                while (strcmp(substring, patterns[keyword].pattern) != 0 && keyword < SUPPORTED_KEYWORDS) {
                     keyword++;
                 }
                 // Enforce valid keyword
@@ -164,9 +168,16 @@ void enrich(char* msg) {
                 } else {
                     currentlyOpen = 'T';
                 }
-                strncpy(msg + pNew, patterns[keyword].replacement, patterns[keyword].replacementLength);
-                pOri += patterns[keyword].patternLength - 1;
-                pNew += patterns[keyword].replacementLength - 1;
+
+                // Actually replace
+                if (noColor == 'F') {
+                    strncpy(msg + pNew, patterns[keyword].replacement, patterns[keyword].replacementLength);
+                    pOri += patterns[keyword].patternLength - 1;
+                    pNew += patterns[keyword].replacementLength - 1;
+                } else {
+                    pOri += patterns[keyword].patternLength;
+                    msg[pNew] = msg[pOri];
+                }
             }
         } else if (pOri > pNew) {
             msg[pNew] = msg[pOri];
