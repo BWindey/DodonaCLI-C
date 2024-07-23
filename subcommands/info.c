@@ -1,4 +1,11 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 #include "info.h"
+#include "../constants.h"
+#include "../libraries/Enrich/enrich.h"
+
 
 const char USAGE_INFO[] = "Usage: dodona info [OPTIONS] COMMAND [ARGS]...\n";
 const char HELP_INFO[] =
@@ -22,7 +29,9 @@ void info(int argc, const char* argv[]) {
         printf("%s\n%s\n", USAGE_INFO, HELP_INFO);
 
     } else if (strcmp(argv[1], "version") == 0) {
-        printf("DodonaCLI v%s\n", VERSION);
+        char version[] = VERSION_FORMATTED;
+        enrich(version);
+        printf("DodonaCLI %s\n", version);
 
     } else if (strcmp(argv[1], "github") == 0) {
         printf("https://www.github.com/BWindey/DodonaCLI-C\n");

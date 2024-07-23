@@ -22,5 +22,5 @@ As long as this version isn't somewhat feature-complete, I'll never recommend it
 - [ ] Implement json 
 - [ ] Implement save-file
 - [ ] Create some abstraction layer around API (maybe some level of caching)
-- [ ] Create some library for displaying rich text (colours, bold, italic, ...)
+- [X] Create some library for displaying rich text (colours, bold, italic, ...)
 

@@ -16,7 +16,8 @@ SRC = $(SRCDIR)/main.c \
       $(SUBCMDIR)/sub.c \
       $(SUBCMDIR)/tutorial.c \
       $(SUBCMDIR)/up.c \
-      $(LIBDIR)/cJSON/cJSON.c
+      $(LIBDIR)/cJSON/cJSON.c \
+      $(LIBDIR)/Enrich/enrich.c
 
 OBJ = $(SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 

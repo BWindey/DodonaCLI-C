@@ -19,54 +19,6 @@ struct patternStruct {
     int replacementLength;
 };
 
-int main() {
-    char msg[] =
-        "NUMBER: [NUMBER]Hello, World![/]\n"
-        "BOLD: [BOLD]Hello, World![/]\n"
-        "DIM: [DIM]Hello, World![/]\n"
-        "ITALIC: [ITALIC]Hello, World![/]\n"
-        "UNDER: [UNDER]Hello, World![/]\n"
-        "STRIKE: [STRIKE]Hello, World![/]\n"
-        "BLACK: [BLACK]Hello, World![/]\n"
-        "BRIGHT-BLACK: [BRIGHT-BLACK]Hello, World![/]\n"
-        "ON BLACK: [ON BLACK]Hello, World![/]\n"
-        "ON BRIGHT-BLACK: [ON BRIGHT-BLACK]Hello, World![/]\n"
-        "RED: [RED]Hello, World![/]\n"
-        "BRIGHT-RED: [BRIGHT-RED]Hello, World![/]\n"
-        "ON RED: [ON RED]Hello, World![/]\n"
-        "ON BRIGHT-RED: [ON BRIGHT-RED]Hello, World![/]\n"
-        "GREEN: [GREEN]Hello, World![/]\n"
-        "BRIGHT-GREEN: [BRIGHT-GREEN]Hello, World![/]\n"
-        "ON GREEN: [ON GREEN]Hello, World![/]\n"
-        "ON BRIGHT-GREEN: [ON BRIGHT-GREEN]Hello, World![/]\n"
-        "YELLOW: [YELLOW]Hello, World![/]\n"
-        "BRIGHT-YELLOW: [BRIGHT-YELLOW]Hello, World![/]\n"
-        "ON YELLOW: [ON YELLOW]Hello, World![/]\n"
-        "ON BRIGHT-YELLOW: [ON BRIGHT-YELLOW]Hello, World![/]\n"
-        "BLUE: [BLUE]Hello, World![/]\n"
-        "BRIGHT-BLUE: [BRIGHT-BLUE]Hello, World![/]\n"
-        "ON BLUE: [ON BLUE]Hello, World![/]\n"
-        "ON BRIGHT-BLUE: [ON BRIGHT-BLUE]Hello, World![/]\n"
-        "MAGENTA: [MAGENTA]Hello, World![/]\n"
-        "BRIGHT-MAGENTA: [BRIGHT-MAGENTA]Hello, World![/]\n"
-        "ON MAGENTA: [ON MAGENTA]Hello, World![/]\n"
-        "ON BRIGHT-MAGENTA: [ON BRIGHT-MAGENTA]Hello, World![/]\n"
-        "CYAN: [CYAN]Hello, World![/]\n"
-        "BRIGHT-CYAN: [BRIGHT-CYAN]Hello, World![/]\n"
-        "ON CYAN: [ON CYAN]Hello, World![/]\n"
-        "ON BRIGHT-CYAN: [ON BRIGHT-CYAN]Hello, World![/]\n"
-        "WHITE: [WHITE]Hello, World![/]\n"
-        "BRIGHT-WHITE: [BRIGHT-WHITE]Hello, World![/]\n"
-        "ON WHITE: [ON WHITE]Hello, World![/]\n"
-        "ON BRIGHT-WHITE: [ON BRIGHT-WHITE]Hello, World![/]\n";
-
-
-    printf("Original msg:\n%s\n", msg);
-    enrich(msg);
-    printf("Enriched msg:\n%s\n", msg);
-
-    return 0;
-}
 
 void enrich(char* msg) {
     char* noColorTemp = getenv("NO_COLOR");

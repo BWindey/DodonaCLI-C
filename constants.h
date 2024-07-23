@@ -1,3 +1,4 @@
 #pragma once
 
-#define VERSION "2024.7.15"
+#define VERSION_FORMATTED "[NUMBER]2024[/].[NUMBER]7[/].[NUMBER]15[/]"
+#define VERSION_CLEAN "2024.7.15"
