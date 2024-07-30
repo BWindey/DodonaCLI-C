@@ -6,6 +6,15 @@ typedef struct wiArrayEl wiArrayEl;
 typedef struct wiValue wiValue;
 typedef struct wiPair wiPair;
 
+typedef union wiValueContents {
+	char* stringVal;
+	int intVal;
+	double floatVal;
+	wiArrayEl* arrayVal;
+	wiValue* objVal;
+	bool boolVal;
+	wiPair* pairVal;
+} wiValueContents;
 
 // Represent arrays by elements pointing to eachother
 typedef struct wiArrayEl {
@@ -18,16 +27,8 @@ typedef struct wiValue {
 	enum wiType {
 		WISTRING, WIINT, WIFLOAT, WIARRAY, WIOBECT, WIBOOL, WIPAIR
 	} _type;
+	wiValueContents contents;
 
-	union wiValueContents {
-		char* stringVal;
-		int intVal;
-		double floatVal;
-		wiArrayEl* arrayVal;
-		wiValue* objVal;
-		bool boolVal;
-		wiPair* pairVal;
-	};
 } wiValue;
 
 // Represent key-value pairs pointing to the next for iteration
