@@ -4,11 +4,22 @@
 
 #include "wiJSON.h"
 
-bool isBlank(const char c) {
-	return c == ' ' || c == '\t' || c == '\n' || c == '\r';
+// Forward declarations
+bool isBlank(const char c);
+int parseJSONValue(const char*, unsigned int);
+
+
+// For testing purposes, a main function.
+// TODO: Remove this when done testing
+int main() {
+	wiValue* root = parseJSON("\"test\"");
+
+	printf("%s", root->contents.pairVal->key);
+	freeEverything(root);
 }
 
-wiValue* parseJSON(char *jsonString) {
+
+wiValue* parseJSON(const char *jsonString) {
 	wiValue* root = (wiValue*)malloc(sizeof(wiValue));
 
 	unsigned int index = 0;
@@ -17,6 +28,8 @@ wiValue* parseJSON(char *jsonString) {
 	while (isBlank(jsonString[index]) && jsonString[index] != '\0') {
 		index++;
 	}
+
+	parseJSONValue(jsonString, index);
 
 
 	return root;
@@ -29,9 +42,6 @@ void freeEverything(wiValue* root) {
 }
 
 
-int main() {
-	wiValue* root = parseJSON("{\"testKey\": \"testVal\"}");
-
-	printf("%s", root->contents.pairVal->key);
-	freeEverything(root);
+bool isBlank(const char c) {
+	return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 }
