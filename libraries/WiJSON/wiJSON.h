@@ -17,7 +17,7 @@ typedef union wiValueContents {
 } wiValueContents;
 
 typedef enum wiType {
-	WISTRING, WIINT, WIFLOAT, WIARRAY, WIOBECT, WIBOOL, WIPAIR
+	WISTRING, WIINT, WIFLOAT, WIARRAY, WIOBECT, WIBOOL, WIPAIR, WINULL
 } wiType;
 
 // Represent arrays by elements pointing to eachother
