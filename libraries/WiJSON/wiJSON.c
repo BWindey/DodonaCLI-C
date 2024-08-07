@@ -24,11 +24,20 @@ int parseJSONNull	(const char*, unsigned int, wiValue*);
 // For testing purposes, a main function.
 // TODO: Remove this when done testing
 int main() {
-	wiValue* root = parseJSON("\"Hello, World!\"");
+	wiValue* root = parseJSON("[ \"hoi\", \"piepeloi\" ]");
 
 	printf("RootValue type: %d\n", root->_type);
-	printf("WISTRING: %d\n", WISTRING);
-	printf("Value: '%s'\n", root->contents.stringVal);
+	printf("WIARRAY: %d\n", WIARRAY);
+
+	wiArrayEl* test = root->contents.arrayVal;
+	int i = 0;
+
+	do {
+		printf("Array-Element %i: %s\n", i, test->elementVal->contents.stringVal);
+		i++;
+		test = test->nextElement;
+	} while (test != NULL);
+
 	freeEverything(root);
 }
 
@@ -82,9 +91,6 @@ int parseJSONValue(const char *jsonString, unsigned int index, wiValue* parent) 
 
 		case 'n': 	// null
 			index = parseJSONNull(jsonString, index, parent);
-			if (strncmp(jsonString + index, "null", 4) == 0) {
-
-			}
 			break;
 
 		default:	// Try for a number
@@ -188,6 +194,68 @@ int parseJSONObject(const char* jsonString, unsigned int index, wiValue* parent)
 }
 
 int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) {
+	printf(" > In parseJSONArray\n");
+	printf(" > jsonString = '%s'\n", jsonString);
+	printf(" > index = %i\n", index);
+
+	assert(jsonString[index] == '[');
+
+	// Already move index 1 forward, as we don't need the opening quote
+	index++;
+
+	// Find closing ']'
+	printf(" > jsonString[%d]: %c\n", index, jsonString[index]);
+	unsigned int closingIndex = index + 1;
+
+	while (jsonString[closingIndex] != '\0' && jsonString[closingIndex] != ']') {
+		printf(" > jsonString[%d]: %c\n", closingIndex, jsonString[closingIndex]);
+		closingIndex++;
+	}
+	assert(jsonString[closingIndex] == ']');
+
+	printf(" > Opening at %i, closing at %d\n", index, closingIndex);
+
+	index = jumpBlankChars(jsonString, index);
+
+	parent->_type = WIARRAY;
+	wiArrayEl* currentElement;
+	wiValue* currentElementValue;
+
+	// TODO: is this if needed, or will it always execute?
+	if (index < closingIndex) {
+		currentElement = (wiArrayEl*) malloc(sizeof(wiArrayEl));
+		currentElementValue = (wiValue*) malloc(sizeof(wiValue));
+
+		index = parseJSONValue(jsonString, index, currentElementValue);
+
+		index = jumpBlankChars(jsonString, index);
+		assert(jsonString[index] == ',' || jsonString[index] == ']');
+
+		if (jsonString[index] == ',') {
+			index++;
+			index = jumpBlankChars(jsonString, index);
+		}
+
+		parent->contents.arrayVal = currentElement;
+	}
+
+	while (index < closingIndex) {
+		wiArrayEl* previousValue = currentElement;
+
+		currentElement = (wiArrayEl*) malloc(sizeof(wiArrayEl));
+		previousValue->nextElement = currentElement;
+
+		index = parseJSONValue(jsonString, index, currentElement->elementVal);
+		
+		index = jumpBlankChars(jsonString, index);
+		assert(jsonString[index] == ',' || jsonString[index] == ']');
+
+		if (jsonString[index] == ',') {
+			index++;
+			index = jumpBlankChars(jsonString, index);
+		}
+	}
+
 	return index;
 }
 

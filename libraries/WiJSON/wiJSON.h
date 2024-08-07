@@ -20,17 +20,17 @@ typedef enum wiType {
 	WISTRING, WIINT, WIFLOAT, WIARRAY, WIOBECT, WIBOOL, WIPAIR, WINULL
 } wiType;
 
-// Represent arrays by elements pointing to eachother
-typedef struct wiArrayEl {
-	wiValue* elementVal;
-	wiArrayEl* nextElement;
-} wiArrayEl;
-
 // Represent value's from key-value-pairs
 typedef struct wiValue {
 	wiType _type;
 	wiValueContents contents;
 } wiValue;
+
+// Represent arrays by elements pointing to eachother
+typedef struct wiArrayEl {
+	wiValue* elementVal;
+	wiArrayEl* nextElement;
+} wiArrayEl;
 
 // Represent key-value pairs pointing to the next for iteration
 typedef struct wiPair {
