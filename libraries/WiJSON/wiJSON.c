@@ -28,7 +28,7 @@ int main() {
 
 	printf("RootValue type: %d\n", root->_type);
 	printf("WISTRING: %d\n", WISTRING);
-	printf("Value: %s\n", root->contents.stringVal);
+	printf("Value: '%s'\n", root->contents.stringVal);
 	freeEverything(root);
 }
 
@@ -140,7 +140,6 @@ int parseJSONBool(const char* jsonString, unsigned int index, wiValue* parent) {
  * and when it can't find a closing quote.
  */
 int parseJSONString(const char* jsonString, unsigned int index, wiValue* parent) {
-	// TODO: still an off-by-one error
 	assert(jsonString[index] == '"');
 
 	// Already move index 1 forward, as we don't need the opening quote
@@ -155,7 +154,7 @@ int parseJSONString(const char* jsonString, unsigned int index, wiValue* parent)
 	assert(jsonString[closingIndex] == '"');
 
 	char* stringVal = (char*)malloc(sizeof(char) * (closingIndex - index));
-	strncpy(stringVal, jsonString + index, closingIndex - 1 - index);
+	strncpy(stringVal, jsonString + index, closingIndex - index);
 	stringVal[closingIndex - 1] = '\0';
 
 	parent->_type = WISTRING;
