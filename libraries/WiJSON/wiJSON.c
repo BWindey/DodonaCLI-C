@@ -24,11 +24,11 @@ int parseJSONNull	(const char*, unsigned int, wiValue*);
 // For testing purposes, a main function.
 // TODO: Remove this when done testing
 int main() {
-	wiValue* root = parseJSON("false");
+	wiValue* root = parseJSON("\"Hello, World!\"");
 
 	printf("RootValue type: %d\n", root->_type);
-	printf("WINULL: %d\n", WIBOOL);
-	printf("Value: %d\n", root->contents.boolVal);
+	printf("WISTRING: %d\n", WISTRING);
+	printf("Value: %s\n", root->contents.stringVal);
 	freeEverything(root);
 }
 
@@ -98,6 +98,14 @@ int parseJSONInt(const char* jsonString, unsigned int index, wiValue* parent) {
 	return index;
 }
 
+/*
+ * Tries to parse a boolean value and assign it to wiValue* parent contents.
+ *
+ * Returns the index of the next non-blank character after the boolean value.
+ *
+ * Asserts if it doesn't find "true" or "false" from the cursor,
+ * or when the boolean value is followed by an illegal character (for json).
+ */
 int parseJSONBool(const char* jsonString, unsigned int index, wiValue* parent) {
 	if (strncmp(jsonString + index, "true", 4) == 0) {
 		parent->contents.boolVal = true;
@@ -123,8 +131,49 @@ int parseJSONBool(const char* jsonString, unsigned int index, wiValue* parent) {
 	return jumpBlankChars(jsonString, index);
 }
 
+/*
+ * Tries to parse a string and assign it to the wiValue* parent contents.
+ * 
+ * Returns the index of the next non-blank character after the boolean value.
+ *
+ * Asserts if the index isn't standing on the opening '"',
+ * and when it can't find a closing quote.
+ */
 int parseJSONString(const char* jsonString, unsigned int index, wiValue* parent) {
-	return index;
+	// TODO: still an off-by-one error
+	assert(jsonString[index] == '"');
+
+	// Already move index 1 forward, as we don't need the opening quote
+	index++;
+
+	// Find closing '"'
+	unsigned int closingIndex = index + 1;
+	while (jsonString[closingIndex] != '\0' && jsonString[closingIndex] != '"') {
+		closingIndex++;
+	}
+
+	assert(jsonString[closingIndex] == '"');
+
+	char* stringVal = (char*)malloc(sizeof(char) * (closingIndex - index));
+	strncpy(stringVal, jsonString + index, closingIndex - 1 - index);
+	stringVal[closingIndex - 1] = '\0';
+
+	parent->_type = WISTRING;
+	parent->contents.stringVal = stringVal;
+
+	// To check behind string, we move 1 further from the closing quote
+	closingIndex++;
+
+	char nextCharAfterString = jsonString[closingIndex];
+	assert(
+			isBlank(nextCharAfterString) 
+			|| nextCharAfterString == ',' 
+			|| nextCharAfterString == '}' 
+			|| nextCharAfterString == ']'
+			|| nextCharAfterString == '\0'
+	);
+
+	return jumpBlankChars(jsonString, closingIndex);
 }
 
 int parseJSONFloat(const char* jsonString, unsigned int index, wiValue* parent) {
