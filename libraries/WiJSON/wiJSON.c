@@ -218,7 +218,39 @@ int parseJSONNull(const char* jsonString, unsigned int index, wiValue* parent) {
 }
 
 void freeEverything(wiValue* root) {
-	// TODO: 
+	switch (root->_type) {
+		case WISTRING:
+			free(root->contents.stringVal);
+			break;
+
+		case WIARRAY: 
+			{
+				wiArrayEl* currentElement = root->contents.arrayVal;
+				wiArrayEl* nextElement;
+
+				while(currentElement != NULL) {
+					nextElement = currentElement->nextElement;
+
+					freeEverything(currentElement->elementVal);
+					free(currentElement);
+
+					currentElement = nextElement;
+				}
+			}
+			break;
+
+		case WIOBECT:
+			// TODO:
+			break;
+
+		case WIPAIR:
+			// TODO:
+			break;
+
+		default:
+				break;
+	}
+
 	free(root);
 }
 
