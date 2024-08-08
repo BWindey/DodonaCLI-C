@@ -182,6 +182,7 @@ int parseJSONString(const char* jsonString, unsigned int index, wiValue* parent)
 }
 
 int parseJSONFloat(const char* jsonString, unsigned int index, wiValue* parent) {
+	// Use strtod() to parse as double, look up what to do when it will error
 	return index;
 }
 
@@ -193,6 +194,16 @@ int parseJSONObject(const char* jsonString, unsigned int index, wiValue* parent)
 	return index;
 }
 
+/*
+ * Tries to parse a json-array starting from 'index'.
+ *
+ * Returns the index of the next non-blank character after the end of the array
+ *
+ * Asserts when initial jsonString at index != '[', 
+ * and when it can't find a closing bracket before a null-byte,
+ * and when there is no comma or closing bracket after each array-element.
+ * (All disregarding white-space)
+ */
 int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) {
 	printf(" > In parseJSONArray\n");
 	printf(" >> jsonString = '%s'\n", jsonString);
@@ -217,33 +228,16 @@ int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) 
 	wiArrayEl* currentElement;
 	wiValue* currentElementValue;
 
-	// TODO: is this if needed, or will it always execute?
-	if (index < closingIndex) {
-		currentElement = (wiArrayEl*) malloc(sizeof(wiArrayEl));
-		currentElementValue = (wiValue*) malloc(sizeof(wiValue));
+	wiArrayEl* previousElement;
 
-		index = parseJSONValue(jsonString, index, currentElementValue);
-		currentElement->elementVal = currentElementValue;
-
-		index = jumpBlankChars(jsonString, index);
-		assert(jsonString[index] == ',' || jsonString[index] == ']');
-
-		if (jsonString[index] == ',') {
-			index++;
-			index = jumpBlankChars(jsonString, index);
-		}
-
-		parent->contents.arrayVal = currentElement;
-	}
-
+	// Parse every json-value in the array
 	while (index < closingIndex) {
-		wiArrayEl* previousValue = currentElement;
+		previousElement = currentElement;
 
 		currentElement = (wiArrayEl*) malloc(sizeof(wiArrayEl));
 		currentElementValue = (wiValue*) malloc(sizeof(wiValue));
 
-		previousValue->nextElement = currentElement;
-
+		// Parse the actual elementValue
 		index = parseJSONValue(jsonString, index, currentElementValue);
 		currentElement->elementVal = currentElementValue;
 		
@@ -254,9 +248,17 @@ int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) 
 			index++;
 			index = jumpBlankChars(jsonString, index);
 		}
+
+		if (previousElement != NULL) {
+			// Happens when we're at least at the 2nd element in the array
+			previousElement->nextElement = currentElement;
+		} else {
+			// Only happens when it's the first element
+			parent->contents.arrayVal = currentElement;
+		}
 	}
 
-	return index;
+	return jumpBlankChars(jsonString, closingIndex);
 }
 
 /*
