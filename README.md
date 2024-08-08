@@ -7,6 +7,10 @@ If you stumbled upon this, and want to actively use this, please go towards the 
 As long as this version isn't somewhat feature-complete, I'll never recommend it.
 
 
+## Requires:
+gcc and Make to compile, and the C99 standard (for `strtol` and `strtod`). 
+No idea if this works on Windows/MacOS, haven't tested
+
 ## To Do:
 - [ ] All the subcommands:
     - [ ] Display (API)
