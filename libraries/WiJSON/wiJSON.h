@@ -7,7 +7,7 @@ typedef struct wiValue 	 wiValue;
 typedef struct wiPair 	 wiPair;
 
 typedef union wiValueContents {
-	int intVal;
+	long intVal;
 	bool boolVal;
 	char* stringVal;
 	double floatVal;

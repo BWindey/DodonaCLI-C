@@ -24,7 +24,7 @@ int parseJSONValue	(const char*, unsigned int, wiValue*);
 // TODO: Remove this when done testing
 int main() {
 	wiValue* root = parseJSON(
-			"[ true, \"piepeloi\", false,\"Tjopei\" , null]"
+			"[ true, \"piepeloi\", 1234,\"Tjopei\" , null]"
 	);
 
 	printf("RootValue type: %d\n", root->_type);
@@ -187,6 +187,14 @@ int parseJSONString(const char* jsonString, unsigned int index, wiValue* parent)
 	return jumpBlankChars(jsonString, closingIndex);
 }
 
+/*
+ * Tries to parse a json-number (float or int).
+ *
+ * Returns the index of the next non-blank char after the number
+ *
+ * Asserts when index isn't at a valid json-number-character,
+ * or when it fails to parse the number (non-valid number).
+ */
 int parseJSONNumber(const char* jsonString, unsigned int index, wiValue* parent) {
 	assert(
 			jsonString[index] == '+' 
@@ -197,16 +205,45 @@ int parseJSONNumber(const char* jsonString, unsigned int index, wiValue* parent)
 	bool isInteger = true;
 	unsigned int closingIndex = index + 1;
 	while (
-			jsonString[closingIndex] != '\0' 
-			&& !isBlank(jsonString[closingIndex])
-			&& jsonString[index] != ','
-			&& jsonString[index] != ']'
-			&& jsonString[index] != '}'
+		jsonString[closingIndex] != '\0' 
+		&& !isBlank(jsonString[closingIndex])
+		&& jsonString[closingIndex] != ','
+		&& jsonString[closingIndex] != ']'
+		&& jsonString[closingIndex] != '}'
+	) {
+		if (
+			jsonString[closingIndex] == '.' 
+			|| jsonString[closingIndex] == 'e'
+			|| jsonString[closingIndex] == 'E'
 		) {
+			isInteger = false;
+		}
 
+		closingIndex++;
 	}
 
-	return jumpBlankChars(jsonString, index);
+	char number[closingIndex - index];
+	strncpy(number, jsonString + index, closingIndex - index);
+	number[closingIndex - index] = '\0';
+
+	char* end;
+
+	if (isInteger) {
+		long intVal = strtol(number, &end, 10);
+
+		parent->_type = WIINT;
+		parent->contents.intVal = intVal;
+	} else {
+		double floatVal = strtod(number, &end);
+
+		parent->_type = WIFLOAT;
+		parent->contents.floatVal = floatVal;
+	}
+
+	// Check if it was a real parseable number
+	assert(*end == '\0');
+
+	return jumpBlankChars(jsonString, closingIndex);
 }
 
 int parseJSONPair(const char* jsonString, unsigned int index, wiValue* parent) {
