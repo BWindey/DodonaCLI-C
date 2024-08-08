@@ -10,21 +10,22 @@
 bool isBlank(const char);
 int jumpBlankChars(const char*, unsigned int);
 
-int parseJSONValue	(const char*, unsigned int, wiValue*);
-int parseJSONInt	(const char*, unsigned int, wiValue*);
-int parseJSONBool	(const char*, unsigned int, wiValue*);
-int parseJSONString	(const char*, unsigned int, wiValue*);
-int parseJSONFloat	(const char*, unsigned int, wiValue*);
-int parseJSONPair	(const char*, unsigned int, wiValue*);
-int parseJSONObject	(const char*, unsigned int, wiValue*);
 int parseJSONArray	(const char*, unsigned int, wiValue*);
+int parseJSONBool	(const char*, unsigned int, wiValue*);
 int parseJSONNull	(const char*, unsigned int, wiValue*);
+int parseJSONNumber (const char*, unsigned int, wiValue*);
+int parseJSONObject	(const char*, unsigned int, wiValue*);
+int parseJSONPair	(const char*, unsigned int, wiValue*);
+int parseJSONString	(const char*, unsigned int, wiValue*);
+int parseJSONValue	(const char*, unsigned int, wiValue*);
 
 
 // For testing purposes, a main function.
 // TODO: Remove this when done testing
 int main() {
-	wiValue* root = parseJSON("[ \"hoi\", \"piepeloi\",\"Tjopei\" ,\"cho\tcola\"]");
+	wiValue* root = parseJSON(
+			"[ true, \"piepeloi\", false,\"Tjopei\" , null]"
+	);
 
 	printf("RootValue type: %d\n", root->_type);
 	printf("WIARRAY: %d\n", WIARRAY);
@@ -33,7 +34,16 @@ int main() {
 	int i = 0;
 
 	do {
-		printf("Array-Element %i: %s\n", i, test->elementVal->contents.stringVal);
+		printf("Array-Element %i: ", i);
+
+		wiType type = test->elementVal->_type;
+		if (type == WISTRING) {
+			printf("%s\n", test->elementVal->contents.stringVal);
+		} else if (type == WIBOOL) {
+			printf(test->elementVal->contents.boolVal ? "true\n" : "false\n");
+		} else if (type == WINULL) {
+			printf("NULL\n");
+		}
 		i++;
 		test = test->nextElement;
 	} while (test != NULL);
@@ -53,7 +63,6 @@ wiValue* parseJSON(const char *jsonString) {
 	unsigned int index = jumpBlankChars(jsonString, 0);
 
 	parseJSONValue(jsonString, index, root);
-
 
 	return root;
 }
@@ -94,13 +103,10 @@ int parseJSONValue(const char *jsonString, unsigned int index, wiValue* parent) 
 			break;
 
 		default:	// Try for a number
+			index = parseJSONNumber(jsonString, index, parent);
 			break;
 	}
 
-	return index;
-}
-
-int parseJSONInt(const char* jsonString, unsigned int index, wiValue* parent) {
 	return index;
 }
 
@@ -181,9 +187,26 @@ int parseJSONString(const char* jsonString, unsigned int index, wiValue* parent)
 	return jumpBlankChars(jsonString, closingIndex);
 }
 
-int parseJSONFloat(const char* jsonString, unsigned int index, wiValue* parent) {
-	// Use strtod() to parse as double, look up what to do when it will error
-	return index;
+int parseJSONNumber(const char* jsonString, unsigned int index, wiValue* parent) {
+	assert(
+			jsonString[index] == '+' 
+			|| jsonString[index] == '-'
+			|| (jsonString[index] >= '0' && jsonString[index] <= '9')
+	);
+
+	bool isInteger = true;
+	unsigned int closingIndex = index + 1;
+	while (
+			jsonString[closingIndex] != '\0' 
+			&& !isBlank(jsonString[closingIndex])
+			&& jsonString[index] != ','
+			&& jsonString[index] != ']'
+			&& jsonString[index] != '}'
+		) {
+
+	}
+
+	return jumpBlankChars(jsonString, index);
 }
 
 int parseJSONPair(const char* jsonString, unsigned int index, wiValue* parent) {
@@ -205,10 +228,6 @@ int parseJSONObject(const char* jsonString, unsigned int index, wiValue* parent)
  * (All disregarding white-space)
  */
 int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) {
-	printf(" > In parseJSONArray\n");
-	printf(" >> jsonString = '%s'\n", jsonString);
-	printf(" >> index = %i\n\n", index);
-
 	assert(jsonString[index] == '[');
 
 	// Already move index 1 forward, as we don't need the opening quote
