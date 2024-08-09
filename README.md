@@ -6,6 +6,8 @@ If you stumbled upon this, and want to actively use this, please go towards the 
 
 As long as this version isn't somewhat feature-complete, I'll never recommend it.
 
+Currently working on a json-library =)
+
 
 ## Requires:
 gcc and Make to compile, and the C99 standard (for `strtol` and `strtod`). 
