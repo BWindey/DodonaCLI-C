@@ -24,7 +24,7 @@ int parseJSONValue	(const char*, unsigned int, wiValue*);
 // TODO: Remove this when done testing
 int main() {
 	wiValue* root = parseJSON(
-			"{ \"testing\": 1.234 }"
+			"{\"key\": \"value\"}"
 	);
 
 	freeEverything(root);
@@ -228,41 +228,27 @@ int parseJSONPair(const char* jsonString, unsigned int index, wiValue* parent) {
 }
 
 int parseJSONObject(const char* jsonString, unsigned int index, wiValue* parent) {
+	// TODO: Do I really need this parseObject thing?
+	// 		Can't I just immediatly parse the key-value pairs???
 	assert(jsonString[index] == '{');
-
-	unsigned int closingIndex = index + 1;
-	unsigned int depth = 1;
-
-	while (jsonString[closingIndex] != '\0' && depth > 0) {
-		if (jsonString[closingIndex] == '{') {
-			depth++;
-		} else if (jsonString[closingIndex] == '}') {
-			depth--;
-		}
-
-		closingIndex++;
-	}
-
-	assert(depth == 0);
-	// It stopped 1 index too far
-	closingIndex--;
 
 	index++;
 	index = jumpBlankChars(jsonString, index);
 
-	parent->_type = WIOBECT;
+	while (jsonString[index] != '\0' && jsonString[index] != '}') {
+		// Only a key-value pair is possible after a '{'
+		assert(jsonString[index] == '"');
 
-	while (index < closingIndex) {
-		assert(jsonString[index] == '"' || jsonString[index] == '{');
+		index = parseJSONObject(jsonString, index, parent);
+		assert(jsonString[index] == ',' || jsonString[index] == '}');
 
-		if (jsonString[index] == '"') {
-			index = parseJSONPair(jsonString, index, parent);
-		} else {
-			index = parseJSONObject(jsonString, index, parent);
+		if (jsonString[index] == ',') {
+			index++;
+			index = jumpBlankChars(jsonString, index);
 		}
 	}
 
-	return jumpBlankChars(jsonString, closingIndex + 1);
+	return jumpBlankChars(jsonString, index + 1);
 }
 
 /*
@@ -375,7 +361,7 @@ void freeEverything(wiValue* root) {
 			}
 			break;
 
-		case WIOBECT:
+		case WIOBJECT:
 			// TODO:
 			break;
 

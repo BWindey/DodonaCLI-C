@@ -17,7 +17,7 @@ typedef union wiValueContents {
 } wiValueContents;
 
 typedef enum wiType {
-	WISTRING, WIINT, WIFLOAT, WIARRAY, WIOBECT, WIBOOL, WIPAIR, WINULL
+	WISTRING, WIINT, WIFLOAT, WIARRAY, WIOBJECT, WIBOOL, WIPAIR, WINULL
 } wiType;
 
 // Represent value's from key-value-pairs
