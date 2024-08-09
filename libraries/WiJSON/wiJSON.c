@@ -24,29 +24,8 @@ int parseJSONValue	(const char*, unsigned int, wiValue*);
 // TODO: Remove this when done testing
 int main() {
 	wiValue* root = parseJSON(
-			"[ true, \"piepeloi\", 1234,\"Tjopei\" , null]"
+			"{ \"testing\": 1.234 }"
 	);
-
-	printf("RootValue type: %d\n", root->_type);
-	printf("WIARRAY: %d\n", WIARRAY);
-
-	wiArrayEl* test = root->contents.arrayVal;
-	int i = 0;
-
-	do {
-		printf("Array-Element %i: ", i);
-
-		wiType type = test->elementVal->_type;
-		if (type == WISTRING) {
-			printf("%s\n", test->elementVal->contents.stringVal);
-		} else if (type == WIBOOL) {
-			printf(test->elementVal->contents.boolVal ? "true\n" : "false\n");
-		} else if (type == WINULL) {
-			printf("NULL\n");
-		}
-		i++;
-		test = test->nextElement;
-	} while (test != NULL);
 
 	freeEverything(root);
 }
@@ -72,9 +51,6 @@ wiValue* parseJSON(const char *jsonString) {
  * Parses a JSON-value, whether it is an int, string, ... or array 
  * (will delegate)
  *
- * WARNING: requires index to point to the right place to start parsing,
- * 		can't be blank!
- *
  * Returns the index of the last parsed character in the jsonString
  */
 int parseJSONValue(const char *jsonString, unsigned int index, wiValue* parent) {
@@ -83,6 +59,7 @@ int parseJSONValue(const char *jsonString, unsigned int index, wiValue* parent) 
 
 	switch (jsonString[index]) {
 		case '{':	// Object
+			index = parseJSONObject(jsonString, index, parent);
 			break;
 
 		case '[':	// Array
@@ -251,7 +228,41 @@ int parseJSONPair(const char* jsonString, unsigned int index, wiValue* parent) {
 }
 
 int parseJSONObject(const char* jsonString, unsigned int index, wiValue* parent) {
-	return index;
+	assert(jsonString[index] == '{');
+
+	unsigned int closingIndex = index + 1;
+	unsigned int depth = 1;
+
+	while (jsonString[closingIndex] != '\0' && depth > 0) {
+		if (jsonString[closingIndex] == '{') {
+			depth++;
+		} else if (jsonString[closingIndex] == '}') {
+			depth--;
+		}
+
+		closingIndex++;
+	}
+
+	assert(depth == 0);
+	// It stopped 1 index too far
+	closingIndex--;
+
+	index++;
+	index = jumpBlankChars(jsonString, index);
+
+	parent->_type = WIOBECT;
+
+	while (index < closingIndex) {
+		assert(jsonString[index] == '"' || jsonString[index] == '{');
+
+		if (jsonString[index] == '"') {
+			index = parseJSONPair(jsonString, index, parent);
+		} else {
+			index = parseJSONObject(jsonString, index, parent);
+		}
+	}
+
+	return jumpBlankChars(jsonString, closingIndex + 1);
 }
 
 /*
