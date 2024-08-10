@@ -1,7 +1,7 @@
 #include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 
 #include "wiJSON.h"
@@ -14,7 +14,6 @@ int parseJSONArray	(const char*, unsigned int, wiValue*);
 int parseJSONBool	(const char*, unsigned int, wiValue*);
 int parseJSONNull	(const char*, unsigned int, wiValue*);
 int parseJSONNumber (const char*, unsigned int, wiValue*);
-int parseJSONObject	(const char*, unsigned int, wiValue*);
 int parseJSONPair	(const char*, unsigned int, wiValue*);
 int parseJSONString	(const char*, unsigned int, wiValue*);
 int parseJSONValue	(const char*, unsigned int, wiValue*);
@@ -24,8 +23,11 @@ int parseJSONValue	(const char*, unsigned int, wiValue*);
 // TODO: Remove this when done testing
 int main() {
 	wiValue* root = parseJSON(
-			"{\"key\": \"value\"}"
+			"{\"longer-key\": 2390}"
 	);
+
+	printf("Key: '%s'\n", root->contents.pairVal->key);
+	printf("Value: '%li'\n", root->contents.pairVal->value->contents.intVal);
 
 	freeEverything(root);
 }
@@ -59,7 +61,7 @@ int parseJSONValue(const char *jsonString, unsigned int index, wiValue* parent) 
 
 	switch (jsonString[index]) {
 		case '{':	// Object
-			index = parseJSONObject(jsonString, index, parent);
+			index = parseJSONPair(jsonString, index, parent);
 			break;
 
 		case '[':	// Array
@@ -108,15 +110,6 @@ int parseJSONBool(const char* jsonString, unsigned int index, wiValue* parent) {
 	}
 	parent->_type = WIBOOL;
 
-	char nextCharAfterBool = jsonString[index];
-	assert(
-			isBlank(nextCharAfterBool) 
-			|| nextCharAfterBool == ',' 
-			|| nextCharAfterBool == '}' 
-			|| nextCharAfterBool == ']'
-			|| nextCharAfterBool == '\0'
-	);
-
 	return jumpBlankChars(jsonString, index);
 }
 
@@ -151,15 +144,6 @@ int parseJSONString(const char* jsonString, unsigned int index, wiValue* parent)
 
 	// To check behind string, we move 1 further from the closing quote
 	closingIndex++;
-
-	char nextCharAfterString = jsonString[closingIndex];
-	assert(
-			isBlank(nextCharAfterString) 
-			|| nextCharAfterString == ',' 
-			|| nextCharAfterString == '}' 
-			|| nextCharAfterString == ']'
-			|| nextCharAfterString == '\0'
-	);
 
 	return jumpBlankChars(jsonString, closingIndex);
 }
@@ -224,27 +208,48 @@ int parseJSONNumber(const char* jsonString, unsigned int index, wiValue* parent)
 }
 
 int parseJSONPair(const char* jsonString, unsigned int index, wiValue* parent) {
-	return index;
-}
-
-int parseJSONObject(const char* jsonString, unsigned int index, wiValue* parent) {
-	// TODO: Do I really need this parseObject thing?
-	// 		Can't I just immediatly parse the key-value pairs???
 	assert(jsonString[index] == '{');
 
-	index++;
-	index = jumpBlankChars(jsonString, index);
+	parent->_type = WIPAIR;
+	wiPair* currentPair = NULL;
+	wiPair* previousPair;
+
+	wiValue* value;
+	// Can reuse this dummy wiValue, so only initialise once
+	wiValue* dummyForKey = (wiValue*) malloc(sizeof(wiValue));
 
 	while (jsonString[index] != '\0' && jsonString[index] != '}') {
-		// Only a key-value pair is possible after a '{'
-		assert(jsonString[index] == '"');
+		previousPair = currentPair;
+		currentPair = (wiPair*) malloc(sizeof(wiPair));
 
-		index = parseJSONObject(jsonString, index, parent);
+		// Parse key
+		// Doing this with the existing parseJSONString to avoid duplication
+		index = jumpBlankChars(jsonString, index + 1);
+		index = parseJSONString(jsonString, index, dummyForKey);
+		currentPair->key = dummyForKey->contents.stringVal;
+
+		// Check correctness
+		assert(jsonString[index] == ':');
+
+		// Parse value
+		value = (wiValue*) malloc(sizeof(wiValue));
+		index = jumpBlankChars(jsonString, index + 1);
+		index = parseJSONValue(jsonString, index, value);
+		currentPair->value = value;
+
+		// Check correctness and prepare for parsing next if necessary
 		assert(jsonString[index] == ',' || jsonString[index] == '}');
-
 		if (jsonString[index] == ',') {
-			index++;
-			index = jumpBlankChars(jsonString, index);
+			index = jumpBlankChars(jsonString, index + 1);
+			assert(jsonString[index] != '}');
+		}
+
+		// Link pair to parent/previous pair
+		if (previousPair == NULL) {
+			// Only happens with first pair
+			parent->contents.pairVal = currentPair;
+		} else {
+			previousPair->nextPair = currentPair;
 		}
 	}
 
@@ -278,7 +283,7 @@ int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) 
 	index = jumpBlankChars(jsonString, index);
 
 	parent->_type = WIARRAY;
-	wiArrayEl* currentElement;
+	wiArrayEl* currentElement = NULL;
 	wiValue* currentElementValue;
 
 	wiArrayEl* previousElement;
@@ -302,12 +307,11 @@ int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) 
 			index = jumpBlankChars(jsonString, index);
 		}
 
-		if (previousElement != NULL) {
-			// Happens when we're at least at the 2nd element in the array
-			previousElement->nextElement = currentElement;
-		} else {
-			// Only happens when it's the first element
+		if (previousElement == NULL) {
+			// Only happens with the first element
 			parent->contents.arrayVal = currentElement;
+		} else {
+			previousElement->nextElement = currentElement;
 		}
 	}
 
@@ -325,18 +329,8 @@ int parseJSONNull(const char* jsonString, unsigned int index, wiValue* parent) {
 	assert(strncmp(jsonString + index, "null", 4) == 0);
 
 	parent->_type = WINULL;
-	index += 4;
 
-	char nextCharAfterNULL = jsonString[index];
-	assert(
-			isBlank(nextCharAfterNULL) 
-			|| nextCharAfterNULL == ',' 
-			|| nextCharAfterNULL == '}' 
-			|| nextCharAfterNULL == ']'
-			|| nextCharAfterNULL == '\0'
-	);
-
-	return jumpBlankChars(jsonString, index);
+	return jumpBlankChars(jsonString, index + 5);
 }
 
 void freeEverything(wiValue* root) {
@@ -361,12 +355,21 @@ void freeEverything(wiValue* root) {
 			}
 			break;
 
-		case WIOBJECT:
-			// TODO:
-			break;
+		case WIPAIR: 
+			{
+				wiPair* currentPair = root->contents.pairVal;
+				wiPair* nextPair;
 
-		case WIPAIR:
-			// TODO:
+				while(currentPair != NULL) {
+					nextPair = currentPair->nextPair;
+
+					free(currentPair->key);
+					freeEverything(currentPair->value);
+					free(currentPair);
+
+					currentPair = nextPair;
+				}
+			}
 			break;
 
 		default:
