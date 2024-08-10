@@ -251,16 +251,8 @@ int parseJSONPair(const char* jsonString, unsigned int index, wiValue* parent) {
 int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) {
 	assert(jsonString[index] == '[');
 
-	// Already move index 1 forward, as we don't need the opening quote
+	// Already move index 1 forward, as we don't need the opening bracket
 	index++;
-
-	// Find closing ']'
-	unsigned int closingIndex = index + 1;
-
-	while (jsonString[closingIndex] != '\0' && jsonString[closingIndex] != ']') {
-		closingIndex++;
-	}
-	assert(jsonString[closingIndex] == ']');
 
 	index = jumpBlankChars(jsonString, index);
 
@@ -271,7 +263,7 @@ int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) 
 	wiArrayEl* previousElement;
 
 	// Parse every json-value in the array
-	while (index < closingIndex) {
+	while (jsonString[index] != '\0' && jsonString[index] != ']') {
 		previousElement = currentElement;
 
 		currentElement = (wiArrayEl*) malloc(sizeof(wiArrayEl));
@@ -281,7 +273,6 @@ int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) 
 		index = parseJSONValue(jsonString, index, currentElementValue);
 		currentElement->elementVal = currentElementValue;
 		
-		index = jumpBlankChars(jsonString, index);
 		assert(jsonString[index] == ',' || jsonString[index] == ']');
 
 		if (jsonString[index] == ',') {
@@ -297,7 +288,7 @@ int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) 
 		}
 	}
 
-	return jumpBlankChars(jsonString, closingIndex);
+	return jumpBlankChars(jsonString, index);
 }
 
 /*
