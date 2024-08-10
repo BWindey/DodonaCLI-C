@@ -288,7 +288,7 @@ int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) 
 		}
 	}
 
-	return jumpBlankChars(jsonString, index);
+	return jumpBlankChars(jsonString, index + 1);
 }
 
 /*
