@@ -19,20 +19,6 @@ int parseJSONString	(const char*, unsigned int, wiValue*);
 int parseJSONValue	(const char*, unsigned int, wiValue*);
 
 
-// For testing purposes, a main function.
-// TODO: Remove this when done testing
-int main() {
-	wiValue* root = parseJSON(
-			"{\"longer-key\": 2390}"
-	);
-
-	printf("Key: '%s'\n", root->contents.pairVal->key);
-	printf("Value: '%li'\n", root->contents.pairVal->value->contents.intVal);
-
-	freeEverything(root);
-}
-
-
 /*
  * Entrypoint of the library.
  * Takes in the jsonString and returns a wiValue pointer
@@ -239,10 +225,6 @@ int parseJSONPair(const char* jsonString, unsigned int index, wiValue* parent) {
 
 		// Check correctness and prepare for parsing next if necessary
 		assert(jsonString[index] == ',' || jsonString[index] == '}');
-		if (jsonString[index] == ',') {
-			index = jumpBlankChars(jsonString, index + 1);
-			assert(jsonString[index] != '}');
-		}
 
 		// Link pair to parent/previous pair
 		if (previousPair == NULL) {
