@@ -303,7 +303,7 @@ int parseJSONNull(const char* jsonString, unsigned int index, wiValue* parent) {
 
 	parent->_type = WINULL;
 
-	return jumpBlankChars(jsonString, index + 5);
+	return jumpBlankChars(jsonString, index + 4);
 }
 
 void freeEverything(wiValue* root) {
