@@ -123,7 +123,7 @@ int parseJSONString(const char* jsonString, unsigned int index, wiValue* parent)
 
 	char* stringVal = (char*)malloc(sizeof(char) * (closingIndex - index));
 	strncpy(stringVal, jsonString + index, closingIndex - index);
-	stringVal[closingIndex - 1] = '\0';
+	stringVal[closingIndex - index] = '\0';
 
 	parent->_type = WISTRING;
 	parent->contents.stringVal = stringVal;
