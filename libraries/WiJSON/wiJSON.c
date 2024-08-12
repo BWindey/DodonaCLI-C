@@ -121,9 +121,12 @@ int parseJSONString(const char* jsonString, unsigned int index, wiValue* parent)
 
 	assert(jsonString[closingIndex] == '"');
 
-	char* stringVal = (char*)malloc(sizeof(char) * (closingIndex - index));
-	strncpy(stringVal, jsonString + index, closingIndex - index);
-	stringVal[closingIndex - index] = '\0';
+	unsigned int substringLength = closingIndex - index;
+
+	// length+1 for null-byte
+	char* stringVal = (char*)malloc(sizeof(char) * (substringLength + 1));
+	strncpy(stringVal, jsonString + index, substringLength);
+	stringVal[substringLength] = '\0';
 
 	parent->_type = WISTRING;
 	parent->contents.stringVal = stringVal;
@@ -207,6 +210,7 @@ int parseJSONPair(const char* jsonString, unsigned int index, wiValue* parent) {
 	while (jsonString[index] != '\0' && jsonString[index] != '}') {
 		previousPair = currentPair;
 		currentPair = (wiPair*) malloc(sizeof(wiPair));
+		currentPair->nextPair = NULL;
 
 		// Parse key
 		// Doing this with the existing parseJSONString to avoid duplication
@@ -235,6 +239,8 @@ int parseJSONPair(const char* jsonString, unsigned int index, wiValue* parent) {
 		}
 	}
 
+	free(dummyForKey);
+
 	return jumpBlankChars(jsonString, index + 1);
 }
 
@@ -260,7 +266,7 @@ int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) 
 	wiArrayEl* currentElement = NULL;
 	wiValue* currentElementValue;
 
-	wiArrayEl* previousElement;
+	wiArrayEl* previousElement = NULL;
 
 	// Parse every json-value in the array
 	while (jsonString[index] != '\0' && jsonString[index] != ']') {
@@ -268,6 +274,8 @@ int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) 
 
 		currentElement = (wiArrayEl*) malloc(sizeof(wiArrayEl));
 		currentElementValue = (wiValue*) malloc(sizeof(wiValue));
+
+		currentElement->nextElement = NULL;
 
 		// Parse the actual elementValue
 		index = parseJSONValue(jsonString, index, currentElementValue);
