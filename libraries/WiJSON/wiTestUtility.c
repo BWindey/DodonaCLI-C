@@ -339,11 +339,11 @@ void testObject2() {
 
 	wiPair* pair = testObjectSeries->contents.pairVal;
 
-	assert(get(pair, "id")->contents.intVal == 36018);
-	assert(strcmp(get(pair, "url")->contents.stringVal, "https://dodona.be/nl/series/36018.json") == 0);
-	assert(get(pair, "order")->contents.intVal == 11);
-	assert(get(pair, "visibility_start")->_type == WINULL);
-	assert(strcmp(get(pair, "name")->contents.stringVal, "week 12: tweede evaluaie (JavaScript)"));
+	assert(getIntVal(get(pair, "id")) == 36018);
+	assert(getIntVal(get(pair, "order")) == 11);
+	assert(isNull(get(pair, "visibility_start")));
+	assert(strcmp(getStringVal(get(pair, "url")), "https://dodona.be/nl/series/36018.json") == 0);
+	assert(strcmp(getStringVal(get(pair, "name")), "week 12: tweede evaluaie (JavaScript)"));
 
 	freeEverything(testObjectSeries);
 	char message[] = "Dodona series test [BRIGHT-GREEN]passed[/].\n\n";
