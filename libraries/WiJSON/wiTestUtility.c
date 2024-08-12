@@ -116,6 +116,10 @@ void testSimpleObject() {
 	assert(strcmp(pair4_kv3->key, "key3") == 0);
 	assert(strcmp(getStringVal(pair4_kv3), "value4") == 0);
 
+	freeEverything(testObject1);
+	freeEverything(testObject2);
+	freeEverything(testObject3);
+	freeEverything(testObject4);
 	char message[] = "Simple object tests [BRIGHT-GREEN]succeeded[/].\n\n";
 	enrich(message);
 	printf("%s", message);

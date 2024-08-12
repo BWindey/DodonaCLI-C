@@ -56,6 +56,11 @@ void testSimpleValues() {
 	assert(testFloat->_type == WIFLOAT);
 	assert(testFloat->contents.floatVal == -3.21e5);
 
+	freeEverything(testInt);
+	freeEverything(testBool);
+	freeEverything(testString);
+	freeEverything(testFloat);
+
 	char message[] = "Simple tests [BRIGHT-GREEN]succeeded[/].\n\n";
 	enrich(message);
 	printf("%s", message);
@@ -112,6 +117,8 @@ void testSimpleArray() {
 	assert(currentElement != NULL);
 	assert(currentElement->elementVal->_type == WINULL);
 
+	freeEverything(testArray);
+
 	char message[] = "Simple array tests [BRIGHT-GREEN]succeeded[/].\n\n";
 	enrich(message);
 	printf("%s", message);
@@ -130,6 +137,8 @@ void testSimpleObject() {
 	assert(pair1->value->_type == WISTRING);
 	assert(strcmp(pair1->value->contents.stringVal, "value1") == 0);
 
+	freeEverything(testObject1);
+
 	// Test 2: Simple object with multiple key-value pairs (int and string)
 	wiValue* testObject2 = parseJSON("{ \"key1\": 42, \"key2\": \"value2\" }");
 	assert(testObject2->_type == WIPAIR);
@@ -145,6 +154,8 @@ void testSimpleObject() {
 	assert(strcmp(pair2_kv2->key, "key2") == 0);
 	assert(pair2_kv2->value->_type == WISTRING);
 	assert(strcmp(pair2_kv2->value->contents.stringVal, "value2") == 0);
+
+	freeEverything(testObject2);
 
 	// Test 3: Simple object with multiple key-value pairs (float, bool, string)
 	wiValue* testObject3 = parseJSON("{ \"key1\": 3.14, \"key2\": true, \"key3\": \"value3\" }");
@@ -167,6 +178,8 @@ void testSimpleObject() {
 	assert(strcmp(pair3_kv3->key, "key3") == 0);
 	assert(pair3_kv3->value->_type == WISTRING);
 	assert(strcmp(pair3_kv3->value->contents.stringVal, "value3") == 0);
+
+	freeEverything(testObject3);
 
 	// Test 4: Simple object with an array and other values
 	wiValue* testObject4 = parseJSON("{ \"key1\": [1, 2, 3], \"key2\": false, \"key3\": \"value4\" }");
@@ -204,6 +217,8 @@ void testSimpleObject() {
 	assert(strcmp(pair4_kv3->key, "key3") == 0);
 	assert(pair4_kv3->value->_type == WISTRING);
 	assert(strcmp(pair4_kv3->value->contents.stringVal, "value4") == 0);
+
+	freeEverything(testObject4);
 
 	char message[] = "Simple object tests [BRIGHT-GREEN]succeeded[/].\n\n";
 	enrich(message);
