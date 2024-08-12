@@ -12,7 +12,6 @@ typedef union wiValueContents {
 	char* stringVal;
 	double floatVal;
 	wiPair* pairVal;
-	wiValue* objVal;
 	wiArrayEl* arrayVal;
 } wiValueContents;
 
