@@ -11,4 +11,6 @@ double getFloatVal(wiPair*);
 wiPair* getPairVal(wiPair*);
 wiArrayEl* getArrayVal(wiPair*);
 
-wiValue* get(wiPair*, const char*);
+bool isNull(wiPair*);
+
+wiPair* get(wiPair*, const char*);

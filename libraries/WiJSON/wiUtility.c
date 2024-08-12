@@ -35,17 +35,21 @@ wiArrayEl* getArrayVal(wiPair* pair) {
 	return pair->value->contents.arrayVal;
 }
 
+bool isNull(wiPair* pair) {
+	return pair->value->_type == WINULL;
+}
+
 /*
  * Finds a pair with a matching key, and returns the corresponding value.
  * 
  * Returns NULL if none was present.
  */
-wiValue* get(wiPair* pair, const char* key) {
+wiPair* get(wiPair* pair, const char* key) {
 	while (pair != NULL && strcmp(pair->key, key) != 0) {
 		pair = pair->nextPair;
 	}
 	if (pair == NULL) {
 		return NULL;
 	}
-	return pair->value;
+	return pair;
 }
