@@ -7,11 +7,12 @@ LDFLAGS = -L../WiEnrich/lib -lwienrich
 SRCDIR = src
 INCDIR = include
 OBJDIR = obj
+LIBDIR = lib
 TESTDIR = test
 WIENRICH_DIR = ../WiEnrich
 
 # Library names
-LIBRARY = libwiJSON.a
+LIBRARY = $(LIBDIR)/libwiJSON.a
 WIENRICH_LIB = $(WIENRICH_DIR)/lib/libwienrich.a
 
 # Source and object files
@@ -51,7 +52,7 @@ $(TESTDIR)/%.out: $(TESTDIR)/%.c $(LIBRARY) $(WIENRICH_LIB)
 
 # Clean up
 clean:
-	rm -rf $(OBJDIR) $(LIBRARY) $(TEST_EXECUTABLES)
+	rm -rf $(OBJDIR) $(LIBRARY) $(TEST_EXECUTABLES) $(LIBDIR)
 	$(MAKE) -C $(WIENRICH_DIR) clean
 
 .PHONY: test clean all
