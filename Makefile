@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11
+CFLAGS = -Wall -Wextra -std=c99
 SRCDIR = .
 SUBCMDIR = $(SRCDIR)/subcommands
 LIBDIR = $(SRCDIR)/libraries
