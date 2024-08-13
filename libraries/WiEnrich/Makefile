@@ -11,7 +11,7 @@ LIBDIR = lib
 # Files
 SRC = $(SRCDIR)/enrich.c
 OBJ = $(OBJDIR)/enrich.o
-LIB = $(LIBDIR)/libenrich.a
+LIB = $(LIBDIR)/libwienrich.a
 
 # Default target to build the library
 all: $(LIB)

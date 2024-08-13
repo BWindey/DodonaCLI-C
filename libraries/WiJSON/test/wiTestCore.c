@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "../include/wiJSON.h"
-#include "../../Enrich/enrich.h"
+#include "../../WiEnrich/include/enrich.h"
 
 
 void testSimpleValues();
@@ -18,7 +18,7 @@ void testObject4(); */
 
 int main() {
 	char msg[] = "[BRIGHT-YELLOW][UNDER]Core tests...[/]\n";
-	enrich(msg);
+	wiEnrich(msg);
 	printf("%s", msg);
 
 	testSimpleValues();
@@ -31,7 +31,7 @@ int main() {
 	testObject4(); */
 
 	char message[] = "[BLACK][ON BRIGHT-GREEN]All tests passed.[/]\n\n";
-	enrich(message);
+	wiEnrich(message);
 	printf("%s", message);
 
 	return 0;
@@ -62,7 +62,7 @@ void testSimpleValues() {
 	freeEverything(testFloat);
 
 	char message[] = "Simple tests [BRIGHT-GREEN]succeeded[/].\n\n";
-	enrich(message);
+	wiEnrich(message);
 	printf("%s", message);
 }
 
@@ -120,7 +120,7 @@ void testSimpleArray() {
 	freeEverything(testArray);
 
 	char message[] = "Simple array tests [BRIGHT-GREEN]succeeded[/].\n\n";
-	enrich(message);
+	wiEnrich(message);
 	printf("%s", message);
 }
 
@@ -221,7 +221,7 @@ void testSimpleObject() {
 	freeEverything(testObject4);
 
 	char message[] = "Simple object tests [BRIGHT-GREEN]succeeded[/].\n\n";
-	enrich(message);
+	wiEnrich(message);
 	printf("%s", message);
 }
 
@@ -430,7 +430,7 @@ void testObject1() {
 
 	freeEverything(testObjectCourses);
 	char message[] = "Dodona courses test [BRIGHT-GREEN]passed[/].\n\n";
-	enrich(message);
+	wiEnrich(message);
 	printf("%s", message);
 }
 
@@ -546,7 +546,7 @@ void testObject2() {
 
 	freeEverything(testObjectSeries);
 	char message[] = "Dodona series test [BRIGHT-GREEN]passed[/].\n\n";
-	enrich(message);
+	wiEnrich(message);
 	printf("%s", message);
 }
 

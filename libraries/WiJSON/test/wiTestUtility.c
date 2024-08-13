@@ -5,7 +5,7 @@
 
 #include "../include/wiJSON.h"
 #include "../include/wiUtility.h"
-#include "../../Enrich/enrich.h"
+#include "../../WiEnrich/include/enrich.h"
 
 
 void testSimpleObject();
@@ -17,7 +17,7 @@ void testObject4(); */
 
 int main() {
 	char msg[] = "[BRIGHT-YELLOW][UNDER]Utility tests...[/]\n";
-	enrich(msg);
+	wiEnrich(msg);
 	printf("%s", msg);
 
 	testSimpleObject();
@@ -28,7 +28,7 @@ int main() {
 	testObject4(); */
 
 	char message[] = "[BLACK][ON BRIGHT-GREEN]All utility tests passed.[/]\n\n";
-	enrich(message);
+	wiEnrich(message);
 	printf("%s", message);
 
 	return 0;
@@ -121,7 +121,7 @@ void testSimpleObject() {
 	freeEverything(testObject3);
 	freeEverything(testObject4);
 	char message[] = "Simple object tests [BRIGHT-GREEN]succeeded[/].\n\n";
-	enrich(message);
+	wiEnrich(message);
 	printf("%s", message);
 }
 
@@ -316,7 +316,7 @@ void testObject1() {
 
 	freeEverything(testObjectCourses);
 	char message[] = "Dodona courses test [BRIGHT-GREEN]passed[/].\n\n";
-	enrich(message);
+	wiEnrich(message);
 	printf("%s", message);
 }
 
@@ -351,7 +351,7 @@ void testObject2() {
 
 	freeEverything(testObjectSeries);
 	char message[] = "Dodona series test [BRIGHT-GREEN]passed[/].\n\n";
-	enrich(message);
+	wiEnrich(message);
 	printf("%s", message);
 }
 

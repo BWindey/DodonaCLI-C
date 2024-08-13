@@ -1,53 +1,57 @@
-cc = GCC
-CFLAGS = -Iinclude -Wall -Wextra -std=c99
+# Compiler and flags
+CC = gcc
+CFLAGS = -Iinclude -I../WiEnrich -Wall -Wextra -pedantic
+LDFLAGS = -L../WiEnrich/lib -lwienrich
 
-SRC_DIR = src
-OBJ_DIR = obj
-TEST_DIR = test
-ENRICH_DIR = ../Enrich
+# Directories
+SRCDIR = src
+INCDIR = include
+OBJDIR = obj
+TESTDIR = test
+WIENRICH_DIR = ../WiEnrich
 
-SRC = $(wildcard $(SRC_DIR)/*.c) 
-OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC))
+# Library names
+LIBRARY = libwiJSON.a
+WIENRICH_LIB = $(WIENRICH_DIR)/lib/libwienrich.a
 
-TEST_SRC = $(wildcard $(TEST_DIR)/*.c) 
-TEST_OBJ = $(patsubst $(TEST_DIR)/%.c,$(OBJ_DIR)/%.o,$(TEST_SRC))
+# Source and object files
+SRC_FILES = $(wildcard $(SRCDIR)/*.c)
+OBJ_FILES = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRC_FILES))
 
-LIBRARY = libWiJSON.a
-TEST_EXE = $(patsubst $(TEST_DIR)/%.c,$(TEST_DIR)/%.out,$(TEST_SRC))
+# Test files and their executables
+TEST_SRC_FILES = $(wildcard $(TESTDIR)/*.c)
+TEST_EXECUTABLES = $(patsubst $(TESTDIR)/%.c,$(TESTDIR)/%.out,$(TEST_SRC_FILES))
 
-# Default target: compile source into single object archive
+# Default target
 all: $(LIBRARY)
 
-# How to create library: bundle the object-files together
-$(LIBRARY): $(OBJ)
+# Rule to create the static library for your project
+$(LIBRARY): $(OBJ_FILES)
 	ar rcs $@ $^
 
-# How to create the object files: with gcc -c <.c-files>
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c 
-	@mkdir -p $(OBJ_DIR)
+# Rule to build the WiEnrich library
+$(WIENRICH_LIB):
+	$(MAKE) -C $(WIENRICH_DIR)
+
+# Rule to compile object files
+$(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Object files for tests
-$(OBJ_DIR)/%.o: $(TEST_DIR)/%.c $(ENRICH_DIR)/enrich.c
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+# Ensure obj directory exists
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
 
-# Test executables
-$(TEST_DIR)%.out: $(TEST_OBJ)/%.o $(LIBRARY)
-	$(CC) $(CFLAGS) $^ -o $@
+# Rule to build and run tests
+test: $(WIENRICH_LIB) $(TEST_EXECUTABLES)
+	for test_exec in $(TEST_EXECUTABLES); do ./$$test_exec; done
 
-# Target to run the tests
-test: $(TEST_EXE)
-	@echo "Running tests..."
-	@for exe in $(TEST_EXE); do ./$$exe || exit 1; done
-	@echo "All tests passed."
+# Rule to compile test executables
+$(TESTDIR)/%.out: $(TESTDIR)/%.c $(LIBRARY) $(WIENRICH_LIB)
+	$(CC) $(CFLAGS) $< -o $@ -L. -lwiJSON $(LDFLAGS)
 
-
-# Target to clean everything but the source-files
+# Clean up
 clean:
-	rm -f $(OBJ) $(LIBRARY) $(TEST_OBJ) $(TEST_EXE)
-	rm -rf $(OBJ_DIR)
+	rm -rf $(OBJDIR) $(LIBRARY) $(TEST_EXECUTABLES)
+	$(MAKE) -C $(WIENRICH_DIR) clean
 
-
-.PHONY: all clean test
-
+.PHONY: test clean all
