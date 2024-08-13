@@ -4,32 +4,32 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "wiJSON.h"
+#include "../include/wiJSON.h"
 
 // Forward declarations
 bool isBlank(const char);
-int jumpBlankChars(const char*, unsigned int);
+unsigned int jumpBlankChars(const char*, unsigned int);
 
-int parseJSONArray	(const char*, unsigned int, wiValue*);
-int parseJSONBool	(const char*, unsigned int, wiValue*);
-int parseJSONNull	(const char*, unsigned int, wiValue*);
-int parseJSONNumber (const char*, unsigned int, wiValue*);
-int parseJSONPair	(const char*, unsigned int, wiValue*);
-int parseJSONString	(const char*, unsigned int, wiValue*);
-int parseJSONValue	(const char*, unsigned int, wiValue*);
+unsigned int parseArray	(const char*, unsigned int, wiValue*);
+unsigned int parseBool	(const char*, unsigned int, wiValue*);
+unsigned int parseNull	(const char*, unsigned int, wiValue*);
+unsigned int parseNumber(const char*, unsigned int, wiValue*);
+unsigned int parsePair	(const char*, unsigned int, wiValue*);
+unsigned int parseString(const char*, unsigned int, wiValue*);
+unsigned int parseValue	(const char*, unsigned int, wiValue*);
 
 
 /*
  * Entrypoint of the library.
  * Takes in the jsonString and returns a wiValue pointer
  */
-wiValue* parseJSON(const char *jsonString) {
+wiValue* parseJSONString(const char *jsonString) {
 	wiValue* root = (wiValue*)malloc(sizeof(wiValue));
 
 	// Start index at first non-blank char
 	unsigned int index = jumpBlankChars(jsonString, 0);
 
-	parseJSONValue(jsonString, index, root);
+	parseValue(jsonString, index, root);
 
 	return root;
 }
@@ -41,34 +41,34 @@ wiValue* parseJSON(const char *jsonString) {
  *
  * Returns the index of the last parsed character in the jsonString
  */
-int parseJSONValue(const char *jsonString, unsigned int index, wiValue* parent) {
+unsigned int parseValue(const char *jsonString, unsigned int index, wiValue* parent) {
 	// Enforce we can start parsing
 	assert(!isBlank(jsonString[index]));
 
 	switch (jsonString[index]) {
 		case '{':	// Object
-			index = parseJSONPair(jsonString, index, parent);
+			index = parsePair(jsonString, index, parent);
 			break;
 
 		case '[':	// Array
-			index = parseJSONArray(jsonString, index, parent);
+			index = parseArray(jsonString, index, parent);
 			break;
 
 		case '"':	// String
-			index = parseJSONString(jsonString, index, parent);
+			index = parseString(jsonString, index, parent);
 			break;
 
 		case 't':	// Boolean (fall-through)
 		case 'f':
-			index = parseJSONBool(jsonString, index, parent);
+			index = parseBool(jsonString, index, parent);
 			break;
 
 		case 'n': 	// null
-			index = parseJSONNull(jsonString, index, parent);
+			index = parseNull(jsonString, index, parent);
 			break;
 
 		default:	// Try for a number
-			index = parseJSONNumber(jsonString, index, parent);
+			index = parseNumber(jsonString, index, parent);
 			break;
 	}
 
@@ -83,7 +83,7 @@ int parseJSONValue(const char *jsonString, unsigned int index, wiValue* parent) 
  * Asserts if it doesn't find "true" or "false" from the cursor,
  * or when the boolean value is followed by an illegal character (for json).
  */
-int parseJSONBool(const char* jsonString, unsigned int index, wiValue* parent) {
+unsigned int parseBool(const char* jsonString, unsigned int index, wiValue* parent) {
 	if (strncmp(jsonString + index, "true", 4) == 0) {
 		parent->contents.boolVal = true;
 		index += 4;		// Length of "true"
@@ -107,7 +107,7 @@ int parseJSONBool(const char* jsonString, unsigned int index, wiValue* parent) {
  * Asserts if the index isn't standing on the opening '"',
  * and when it can't find a closing quote.
  */
-int parseJSONString(const char* jsonString, unsigned int index, wiValue* parent) {
+unsigned int parseString(const char* jsonString, unsigned int index, wiValue* parent) {
 	assert(jsonString[index] == '"');
 
 	// Already move index 1 forward, as we don't need the opening quote
@@ -145,7 +145,7 @@ int parseJSONString(const char* jsonString, unsigned int index, wiValue* parent)
  * Asserts when index isn't at a valid json-number-character,
  * or when it fails to parse the number (non-valid number).
  */
-int parseJSONNumber(const char* jsonString, unsigned int index, wiValue* parent) {
+unsigned int parseNumber(const char* jsonString, unsigned int index, wiValue* parent) {
 	assert(
 			jsonString[index] == '+' 
 			|| jsonString[index] == '-'
@@ -196,7 +196,7 @@ int parseJSONNumber(const char* jsonString, unsigned int index, wiValue* parent)
 	return jumpBlankChars(jsonString, closingIndex);
 }
 
-int parseJSONPair(const char* jsonString, unsigned int index, wiValue* parent) {
+unsigned int parsePair(const char* jsonString, unsigned int index, wiValue* parent) {
 	assert(jsonString[index] == '{');
 
 	parent->_type = WIPAIR;
@@ -215,7 +215,7 @@ int parseJSONPair(const char* jsonString, unsigned int index, wiValue* parent) {
 		// Parse key
 		// Doing this with the existing parseJSONString to avoid duplication
 		index = jumpBlankChars(jsonString, index + 1);
-		index = parseJSONString(jsonString, index, dummyForKey);
+		index = parseString(jsonString, index, dummyForKey);
 		currentPair->key = dummyForKey->contents.stringVal;
 
 		// Check correctness
@@ -224,7 +224,7 @@ int parseJSONPair(const char* jsonString, unsigned int index, wiValue* parent) {
 		// Parse value
 		value = (wiValue*) malloc(sizeof(wiValue));
 		index = jumpBlankChars(jsonString, index + 1);
-		index = parseJSONValue(jsonString, index, value);
+		index = parseValue(jsonString, index, value);
 		currentPair->value = value;
 
 		// Check correctness and prepare for parsing next if necessary
@@ -254,7 +254,7 @@ int parseJSONPair(const char* jsonString, unsigned int index, wiValue* parent) {
  * and when there is no comma or closing bracket after each array-element.
  * (All disregarding white-space)
  */
-int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) {
+unsigned int parseArray(const char* jsonString, unsigned int index, wiValue* parent) {
 	assert(jsonString[index] == '[');
 
 	// Already move index 1 forward, as we don't need the opening bracket
@@ -278,7 +278,7 @@ int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) 
 		currentElement->nextElement = NULL;
 
 		// Parse the actual elementValue
-		index = parseJSONValue(jsonString, index, currentElementValue);
+		index = parseValue(jsonString, index, currentElementValue);
 		currentElement->elementVal = currentElementValue;
 		
 		assert(jsonString[index] == ',' || jsonString[index] == ']');
@@ -306,7 +306,7 @@ int parseJSONArray(const char* jsonString, unsigned int index, wiValue* parent) 
  * It sets the value and type of the wiValue* parent, 
  * and returns the index of the next non-blank character after "null"
  */
-int parseJSONNull(const char* jsonString, unsigned int index, wiValue* parent) {
+unsigned int parseNull(const char* jsonString, unsigned int index, wiValue* parent) {
 	assert(strncmp(jsonString + index, "null", 4) == 0);
 
 	parent->_type = WINULL;
@@ -365,7 +365,7 @@ void freeEverything(wiValue* root) {
  * Returns the index of the first non-blank character
  * starting from 'index'
  */
-int jumpBlankChars(const char* string, unsigned int index) {
+unsigned int jumpBlankChars(const char* string, unsigned int index) {
 	while (isBlank(string[index]) && string[index] != '\0') {
 		index++;
 	}

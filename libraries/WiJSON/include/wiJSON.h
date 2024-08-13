@@ -1,5 +1,6 @@
 #pragma once
 #include <stdbool.h>	// Required for the boolean value
+#include <stdio.h>
 
 // Forward declaration needed for cyclic uses
 typedef struct wiArrayEl wiArrayEl;
@@ -39,5 +40,10 @@ typedef struct wiPair {
 } wiPair;
 
 
-wiValue* parseJSON(const char*);
+wiValue* parseJSONString(const char*);
+wiValue* parseJSONFile(FILE*);
+
+void dumpJSONToString(wiValue* root, char* string);
+void dumpJSONToFile(wiValue* root, char fileName[]);
+
 void freeEverything(wiValue* root);
