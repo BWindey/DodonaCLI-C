@@ -20,6 +20,12 @@ and it will happen in a single pass through the string.
 > To avoid that your program will crash, test it first ;-)
 
 
+## How to use
+Run `make` inside the 'Enrich/' directory. 
+This will produce `lib/libenrich.a`, which you can link to your own program.
+Don't forget to also `#include "enrich.h"` in some way. 
+
+
 ## Limitations
 There are only a limited set of colours available to use. 
 When you have some experience with these escape-characters, 
