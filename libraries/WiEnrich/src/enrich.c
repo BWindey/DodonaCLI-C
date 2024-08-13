@@ -18,7 +18,7 @@ struct patternStruct {
 };
 
 
-void enrich(char* msg) {
+void wiEnrich(char* msg) {
     char* noColorTemp = getenv("NO_COLOR");
     char noColor = (noColorTemp == NULL || strlen(noColorTemp) == 0) ? 'F' : 'T';
 
