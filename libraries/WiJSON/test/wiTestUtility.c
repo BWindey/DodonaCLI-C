@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "wiJSON.h"
-#include "wiUtility.h"
-#include "../Enrich/enrich.h"
+#include "../include/wiJSON.h"
+#include "../include/wiUtility.h"
+#include "../../Enrich/enrich.h"
 
 
 void testSimpleObject();
@@ -38,7 +38,7 @@ void testSimpleObject() {
 	printf("Testing simple objects...\n");
 
 	// Test 1: Simple object with one key-value pair (string)
-	wiValue* testObject1 = parseJSON("{\"key1\":\"value1\"}");
+	wiValue* testObject1 = parseJSONString("{\"key1\":\"value1\"}");
 	assert(testObject1->contents.pairVal != NULL);
 
 	wiPair* pair1 = testObject1->contents.pairVal;
@@ -47,7 +47,7 @@ void testSimpleObject() {
 
 
 	// Test 2: Simple object with multiple key-value pairs (int and string)
-	wiValue* testObject2 = parseJSON("{ \"key1\": 42, \"key2\": \"value2\" }");
+	wiValue* testObject2 = parseJSONString("{ \"key1\": 42, \"key2\": \"value2\" }");
 	assert(testObject2->_type == WIPAIR);
 	assert(testObject2->contents.pairVal != NULL);
 
@@ -62,7 +62,7 @@ void testSimpleObject() {
 
 
 	// Test 3: Simple object with multiple key-value pairs (float, bool, string)
-	wiValue* testObject3 = parseJSON("{ \"key1\": 3.14, \"key2\": true, \"key3\": \"value3\" }");
+	wiValue* testObject3 = parseJSONString("{ \"key1\": 3.14, \"key2\": true, \"key3\": \"value3\" }");
 	assert(testObject3->_type == WIPAIR);
 	assert(testObject3->contents.pairVal != NULL);
 
@@ -82,7 +82,7 @@ void testSimpleObject() {
 
 
 	// Test 4: Simple object with an array and other values
-	wiValue* testObject4 = parseJSON("{ \"key1\": [1, 2, 3], \"key2\": false, \"key3\": \"value4\" }");
+	wiValue* testObject4 = parseJSONString("{ \"key1\": [1, 2, 3], \"key2\": false, \"key3\": \"value4\" }");
 	assert(testObject4->_type == WIPAIR);
 	assert(testObject4->contents.pairVal != NULL);
 
@@ -128,7 +128,7 @@ void testSimpleObject() {
 void testObject1() {
 	// Actual Dodona output
 	printf("Testing Dodona courses...\n");
-	wiValue* testObjectCourses = parseJSON(
+	wiValue* testObjectCourses = parseJSONString(
 		"["
 		"	{"
   		"	  \"id\": 3230,"
@@ -324,7 +324,7 @@ void testObject2() {
 	// Actual Dodona output
 	printf("Testing Dodona series...\n");
 
-	wiValue* testObjectSeries = parseJSON(
+	wiValue* testObjectSeries = parseJSONString(
 		"{"
 		"	\"id\":36018,"
 		"	\"name\":\"week 12: tweede evaluatie (JavaScript)\","

@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "wiJSON.h"
-#include "../Enrich/enrich.h"
+#include "../include/wiJSON.h"
+#include "../../Enrich/enrich.h"
 
 
 void testSimpleValues();
@@ -39,10 +39,10 @@ int main() {
 
 void testSimpleValues() {
 	printf("Testing simple values...\n");
-	wiValue* testInt = parseJSON("993214241");
-	wiValue* testBool = parseJSON("false");
-	wiValue* testString = parseJSON("\"BEGINhiweonfioewfamcl;mkclm oqfnieowq;mfkl;w mfkfo;wqnmcEND\"");
-	wiValue* testFloat = parseJSON("-3.21e5");
+	wiValue* testInt = parseJSONString("993214241");
+	wiValue* testBool = parseJSONString("false");
+	wiValue* testString = parseJSONString("\"BEGINhiweonfioewfamcl;mkclm oqfnieowq;mfkl;w mfkfo;wqnmcEND\"");
+	wiValue* testFloat = parseJSONString("-3.21e5");
 
 	assert(testInt->_type == WIINT);
 	assert(testInt->contents.intVal == 993214241);
@@ -68,7 +68,7 @@ void testSimpleValues() {
 
 void testSimpleArray() {
 	printf("Testing simple array...\n");
-	wiValue* testArray = parseJSON(
+	wiValue* testArray = parseJSONString(
 		"[ 1, -32.4, \"Hello, World!\", true, false, -32e4, null]"
 	);
 
@@ -128,7 +128,7 @@ void testSimpleObject() {
 	printf("Testing simple objects...\n");
 
 	// Test 1: Simple object with one key-value pair (string)
-	wiValue* testObject1 = parseJSON("{\"key1\":\"value1\"}");
+	wiValue* testObject1 = parseJSONString("{\"key1\":\"value1\"}");
 	assert(testObject1->_type == WIPAIR);
 	assert(testObject1->contents.pairVal != NULL);
 
@@ -140,7 +140,7 @@ void testSimpleObject() {
 	freeEverything(testObject1);
 
 	// Test 2: Simple object with multiple key-value pairs (int and string)
-	wiValue* testObject2 = parseJSON("{ \"key1\": 42, \"key2\": \"value2\" }");
+	wiValue* testObject2 = parseJSONString("{ \"key1\": 42, \"key2\": \"value2\" }");
 	assert(testObject2->_type == WIPAIR);
 	assert(testObject2->contents.pairVal != NULL);
 
@@ -158,7 +158,7 @@ void testSimpleObject() {
 	freeEverything(testObject2);
 
 	// Test 3: Simple object with multiple key-value pairs (float, bool, string)
-	wiValue* testObject3 = parseJSON("{ \"key1\": 3.14, \"key2\": true, \"key3\": \"value3\" }");
+	wiValue* testObject3 = parseJSONString("{ \"key1\": 3.14, \"key2\": true, \"key3\": \"value3\" }");
 	assert(testObject3->_type == WIPAIR);
 	assert(testObject3->contents.pairVal != NULL);
 
@@ -182,7 +182,7 @@ void testSimpleObject() {
 	freeEverything(testObject3);
 
 	// Test 4: Simple object with an array and other values
-	wiValue* testObject4 = parseJSON("{ \"key1\": [1, 2, 3], \"key2\": false, \"key3\": \"value4\" }");
+	wiValue* testObject4 = parseJSONString("{ \"key1\": [1, 2, 3], \"key2\": false, \"key3\": \"value4\" }");
 	assert(testObject4->_type == WIPAIR);
 	assert(testObject4->contents.pairVal != NULL);
 
@@ -228,7 +228,7 @@ void testSimpleObject() {
 void testObject1() {
 	// Actual Dodona output
 	printf("Testing Dodona courses...\n");
-	wiValue* testObjectCourses = parseJSON(
+	wiValue* testObjectCourses = parseJSONString(
 		"["
 		"	{"
   		"	  \"id\": 3230,"
@@ -438,7 +438,7 @@ void testObject2() {
 	// Actual Dodona output
 	printf("Testing Dodona series...\n");
 
-	wiValue* testObjectSeries = parseJSON(
+	wiValue* testObjectSeries = parseJSONString(
 			"{\"id\":36018,\"name\":\"week 12: tweede evaluatie (JavaScript)\",\"description\":\"test-description101\",\"visibility\":\"open\",\"visibility_start\":null,\"order\":11,\"created_at\":\"2024-02-08T14:51:07.000+01:00\",\"updated_at\":\"2024-05-25T21:00:13.000+02:00\",\"deadline\":\"2024-05-14T17:10:00.000+02:00\",\"url\":\"https://dodona.be/nl/series/36018.json\",\"course\":\"https://dodona.be/nl/courses/3355.json\",\"exercises\":\"https://dodona.be/nl/series/36018/activities.json\"}"
 	);
 
