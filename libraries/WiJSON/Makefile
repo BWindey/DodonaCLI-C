@@ -4,15 +4,16 @@ CFLAGS = -Iinclude -Wall -Wextra -std=c99
 SRC_DIR = src
 OBJ_DIR = obj
 TEST_DIR = test
+ENRICH_DIR = ../Enrich
 
 SRC = $(wildcard $(SRC_DIR)/*.c) 
 OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC))
 
 TEST_SRC = $(wildcard $(TEST_DIR)/*.c) 
 TEST_OBJ = $(patsubst $(TEST_DIR)/%.c,$(OBJ_DIR)/%.o,$(TEST_SRC))
-TEST_EXE = $(TEST_SRC:.c=.out)
 
 LIBRARY = libWiJSON.a
+TEST_EXE = $(patsubst $(TEST_DIR)/%.c,$(TEST_DIR)/%.out,$(TEST_SRC))
 
 # Default target: compile source into single object archive
 all: $(LIBRARY)
@@ -26,9 +27,13 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+# Object files for tests
+$(OBJ_DIR)/%.o: $(TEST_DIR)/%.c $(ENRICH_DIR)/enrich.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # Test executables
-$(TEST_EXE): $(TEST_OBJ) $(LIBRARY)
+$(TEST_DIR)%.out: $(TEST_OBJ)/%.o $(LIBRARY)
 	$(CC) $(CFLAGS) $^ -o $@
 
 # Target to run the tests
