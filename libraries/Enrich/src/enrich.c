@@ -3,13 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "enrich.h"
+#include "../include/enrich.h"
 
 // [/] is smallest pattern to search for, next smallest is [RED]
 #define MIN_PATTERN_LENGTH 3
 #define SUPPORTED_KEYWORDS 38
-
-// #define DEBUG
 
 
 struct patternStruct {
@@ -34,45 +32,45 @@ void enrich(char* msg) {
     unsigned int pNew = 0;
 
     const struct patternStruct patterns[] = {
-        {"/",               "\e[0m",    3,  4},
-        {"NUMBER",          "\e[1;36m", 8,  7},
-        {"BOLD",            "\e[1m",    6,  4},
-        {"DIM",             "\e[2m",    5,  4},
-        {"ITALIC",          "\e[3m",    8,  4},
-        {"UNDER",           "\e[4m",    7,  4},
-        {"STRIKE",          "\e[9m",    8,  4},
-        {"BLACK",           "\e[30m",   7,  5},
-        {"BRIGHT-BLACK",    "\e[90m",   14, 5},
-        {"ON BLACK",        "\e[40m",   10, 5},
-        {"ON BRIGHT-BLACK", "\e[100m",  17, 6},
-        {"RED",             "\e[31m",   5,  5},
-        {"BRIGHT-RED",      "\e[91m",   12, 5},
-        {"ON RED",          "\e[41m",   8,  5},
-        {"ON BRIGHT-RED",   "\e[101m",  15, 6},
-        {"GREEN",           "\e[32m",   7,  5},
-        {"BRIGHT-GREEN",    "\e[92m",   14, 5},
-        {"ON GREEN",        "\e[42m",   10, 5},
-        {"ON BRIGHT-GREEN", "\e[102m",  17, 6},
-        {"YELLOW",          "\e[33m",   8,  5},
-        {"BRIGHT-YELLOW",   "\e[93m",   15, 5},
-        {"ON YELLOW",       "\e[43m",   11, 5},
-        {"ON BRIGHT-YELLOW","\e[103m",  18, 6},
-        {"BLUE",            "\e[34m",   6,  5},
-        {"BRIGHT-BLUE",     "\e[94m",   13, 5},
-        {"ON BLUE",         "\e[44m",   9,  5},
-        {"ON BRIGHT-BLUE",  "\e[104m",  16, 6},
-        {"MAGENTA",         "\e[35m",   9,  5},
-        {"BRIGHT-MAGENTA",  "\e[95m",   16, 5},
-        {"ON MAGENTA",      "\e[45m",   12, 5},
-        {"ON BRIGHT-MAGENTA","\e[105m", 19, 6},
-        {"CYAN",            "\e[36m",   6,  5},
-        {"BRIGHT-CYAN",     "\e[96m",   13, 5},
-        {"ON CYAN",         "\e[46m",   9,  5},
-        {"ON BRIGHT-CYAN",  "\e[106m",  16, 6},
-        {"WHITE",           "\e[37m",   7,  5},
-        {"BRIGHT-WHITE",    "\e[97m",   14, 5},
-        {"ON WHITE",        "\e[47m",   10, 5},
-        {"ON BRIGHT-WHITE", "\e[107m",  17, 6}
+        {"/",               "\033[0m",    3,  4},
+        {"NUMBER",          "\033[1;36m", 8,  7},
+        {"BOLD",            "\033[1m",    6,  4},
+        {"DIM",             "\033[2m",    5,  4},
+        {"ITALIC",          "\033[3m",    8,  4},
+        {"UNDER",           "\033[4m",    7,  4},
+        {"STRIKE",          "\033[9m",    8,  4},
+        {"BLACK",           "\033[30m",   7,  5},
+        {"BRIGHT-BLACK",    "\033[90m",   14, 5},
+        {"ON BLACK",        "\033[40m",   10, 5},
+        {"ON BRIGHT-BLACK", "\033[100m",  17, 6},
+        {"RED",             "\033[31m",   5,  5},
+        {"BRIGHT-RED",      "\033[91m",   12, 5},
+        {"ON RED",          "\033[41m",   8,  5},
+        {"ON BRIGHT-RED",   "\033[101m",  15, 6},
+        {"GREEN",           "\033[32m",   7,  5},
+        {"BRIGHT-GREEN",    "\033[92m",   14, 5},
+        {"ON GREEN",        "\033[42m",   10, 5},
+        {"ON BRIGHT-GREEN", "\033[102m",  17, 6},
+        {"YELLOW",          "\033[33m",   8,  5},
+        {"BRIGHT-YELLOW",   "\033[93m",   15, 5},
+        {"ON YELLOW",       "\033[43m",   11, 5},
+        {"ON BRIGHT-YELLOW","\033[103m",  18, 6},
+        {"BLUE",            "\033[34m",   6,  5},
+        {"BRIGHT-BLUE",     "\033[94m",   13, 5},
+        {"ON BLUE",         "\033[44m",   9,  5},
+        {"ON BRIGHT-BLUE",  "\033[104m",  16, 6},
+        {"MAGENTA",         "\033[35m",   9,  5},
+        {"BRIGHT-MAGENTA",  "\033[95m",   16, 5},
+        {"ON MAGENTA",      "\033[45m",   12, 5},
+        {"ON BRIGHT-MAGENTA","\033[105m", 19, 6},
+        {"CYAN",            "\033[36m",   6,  5},
+        {"BRIGHT-CYAN",     "\033[96m",   13, 5},
+        {"ON CYAN",         "\033[46m",   9,  5},
+        {"ON BRIGHT-CYAN",  "\033[106m",  16, 6},
+        {"WHITE",           "\033[37m",   7,  5},
+        {"BRIGHT-WHITE",    "\033[97m",   14, 5},
+        {"ON WHITE",        "\033[47m",   10, 5},
+        {"ON BRIGHT-WHITE", "\033[107m",  17, 6}
     };
 
     // Iterate over msg-string
@@ -100,10 +98,6 @@ void enrich(char* msg) {
                 char substring[j - pOri];
                 strncpy(substring, msg + pOri + 1, j - pOri - 1);
                 substring[j - pOri - 1] = '\0';
-
-                #ifdef DEBUG
-                printf("\nFound keyword: %s\n", substring);
-                #endif
 
                 // Check if valid, and which, keyword
                 keyword = 0;
@@ -138,19 +132,11 @@ void enrich(char* msg) {
 
         pNew++;
         pOri++;
-
-        #ifdef DEBUG
-        printf("After %i/%i: '%s'\e[0m\n", pOri, msgLength, msg);
-        #endif
     }
 
     if (pOri > pNew) {
         msg[pNew] = '\0';
     }
-
-#ifdef DEBUG
-    printf("After loop: %s\e[0m\n\n", msg);
-#endif
 
     // Enforce closed
     assert(currentlyOpen == 'F');
