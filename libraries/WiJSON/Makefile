@@ -28,6 +28,7 @@ all: $(LIBRARY)
 
 # Rule to create the static library for your project
 $(LIBRARY): $(OBJ_FILES)
+	@mkdir -p $(LIBDIR)
 	ar rcs $@ $^
 
 # Rule to build the WiEnrich library
@@ -48,7 +49,7 @@ test: $(WIENRICH_LIB) $(TEST_EXECUTABLES)
 
 # Rule to compile test executables
 $(TESTDIR)/%.out: $(TESTDIR)/%.c $(LIBRARY) $(WIENRICH_LIB)
-	$(CC) $(CFLAGS) $< -o $@ -L. -lwiJSON $(LDFLAGS)
+	$(CC) $(CFLAGS) $< -o $@ -L$(LIBDIR) -lwiJSON $(LDFLAGS)
 
 # Clean up
 clean:
