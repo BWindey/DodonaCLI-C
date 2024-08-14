@@ -129,6 +129,74 @@ void parseBool(FILE* jsonFile, wiValue* parent) {
 }
 
 /*
+ * Tries to parse a string value and assign it to the wiValue* parent contents.
+ *
+ * Asserts when the FILE* doesn't point to a '"' 
+ * and when it couldn't find a closing '"' before EOF.
+ */
+void parseString(FILE* jsonFile, wiValue* parent) {
+	char c = fgetc(jsonFile);
+	assert(c == '"');
+
+	unsigned int buffersize = 16;
+	char* stringVal = (char*) malloc(sizeof(char) * buffersize);
+	assert(stringVal != NULL);
+
+	unsigned int index = 0;
+
+	while (c != EOF && c != '"') {
+		c = fgetc(jsonFile);
+		stringVal[index] = c;
+		index++;
+
+		// Re-allocate to larger string if needed
+		if (index >= buffersize - 1) {
+			buffersize *= 2;
+			stringVal = (char*) realloc((void*) stringVal, sizeof(char) * buffersize);
+			assert(stringVal != NULL);
+		}
+	}
+	stringVal[index - 1] = '\0';
+
+	parent->_type = WISTRING;
+	parent->contents.stringVal = stringVal;
+}
+
+/*
+ * Tries to parse a string value and assign it to the wiValue* parent contents.
+ *
+ * Asserts when the FILE* doesn't point to a '"' 
+ * and when it couldn't find a closing '"' before EOF.
+ */
+void parseNumber(FILE* jsonFile, wiValue* parent) {
+	char c = fgetc(jsonFile);
+	assert(c != EOF);
+	assert(c == '+' || c == '-' || (c >= '0' && c <= '9'));
+
+	bool isInteger = true;
+	// Largest bool is 22 long, + 1 '\0' at the end
+	char buffer[23];
+
+	unsigned int index = 0;
+
+	while (c != EOF && index < 22 && !isBlank(c) && c != ',' && c != ']' && c != '}') {
+		buffer[index] = c;
+		c = fgetc(jsonFile);
+		index++;
+
+		if (c == '.' || c == 'e' || c == 'E') {
+			isInteger = false;
+		}
+	}
+
+	// Check next character, shouldn't be numerical cause it won't get parsed
+	c = fgetc(jsonFile);
+	assert((c < '0' || c > '9') && c != 'e' && c != 'E' && c != '.');
+
+	buffer[index] = '\0';
+}
+
+/*
  * Peeks at the fileptr and returns whether it points to a blank character.
  * Blank characters are defined as ' ', '\t', '\n' and '\r'.
  *
