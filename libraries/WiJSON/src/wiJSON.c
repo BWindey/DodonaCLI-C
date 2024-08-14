@@ -89,7 +89,7 @@ unsigned int parseBool(const char* jsonString, unsigned int index, wiValue* pare
 		index += 4;		// Length of "true"
 
 	} else {
-		assert(strncmp(jsonString + index, "false", 4) == 0);
+		assert(strncmp(jsonString + index, "false", 5) == 0);
 		parent->contents.boolVal = false;
 		index += 5;		// Length of "false"
 
