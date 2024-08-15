@@ -1,14 +1,12 @@
 #include <assert.h>
 #include <string.h>
 
-#include "../include/wiJSON.h"
-#include "../../WiEnrich/include/enrich.h"
+#include "../../include/wiJSON.h"
+#include "../../../WiEnrich/include/enrich.h"
 
 int main() {
 	// Actual Dodona output
-	char startMsg[] = "[UNDER]Testing Dodona series...[/]";
-	wiEnrich(startMsg);
-	printf("\n%s\n", startMsg);
+	printf("Testing Dodona series...\n");
 
 	wiValue* testObjectSeries = parseJSONString(
 			"{\"id\":36018,\"name\":\"week 12: tweede evaluatie (JavaScript)\",\"description\":\"test-description101\",\"visibility\":\"open\",\"visibility_start\":null,\"order\":11,\"created_at\":\"2024-02-08T14:51:07.000+01:00\",\"updated_at\":\"2024-05-25T21:00:13.000+02:00\",\"deadline\":\"2024-05-14T17:10:00.000+02:00\",\"url\":\"https://dodona.be/nl/series/36018.json\",\"course\":\"https://dodona.be/nl/courses/3355.json\",\"exercises\":\"https://dodona.be/nl/series/36018/activities.json\"}"

@@ -1,13 +1,11 @@
 #include <assert.h>
 #include <string.h>
 
-#include "../include/wiJSON.h"
-#include "../../WiEnrich/include/enrich.h"
+#include "../../include/wiJSON.h"
+#include "../../../WiEnrich/include/enrich.h"
 
 int main() {
-	char startMsg[] = "[UNDER]Testing simple object...[/]";
-	wiEnrich(startMsg);
-	printf("\n%s\n", startMsg);
+	printf("Testing simple object...\n");
 
 	// Test 1: Simple object with one key-value pair (string)
 	wiValue* testObject1 = parseJSONString("{\"key1\":\"value1\"}");

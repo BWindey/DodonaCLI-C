@@ -1,14 +1,12 @@
 #include <assert.h>
 #include <string.h>
 
-#include "../include/wiJSON.h"
-#include "../../WiEnrich/include/enrich.h"
+#include "../../include/wiJSON.h"
+#include "../../../WiEnrich/include/enrich.h"
 
 int main() {
 	// Actual Dodona output
-	char startMsg[] = "[UNDER]Testing Dodona courses...[/]";
-	wiEnrich(startMsg);
-	printf("\n%s\n", startMsg);
+	printf("Testing Dodona courses...\n");
 
 	wiValue* testObjectCourses = parseJSONString(
 		"["

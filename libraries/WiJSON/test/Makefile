@@ -20,6 +20,7 @@ UTILITY_EXECUTABLES = $(patsubst $(UTILITY_DIR)/%.c,$(OUT_UTILITY_DIR)/%.out,$(U
 
 # Default target
 all: $(CORE_EXECUTABLES) $(UTILITY_EXECUTABLES)
+	@echo ""
 	@echo "\033[93;4mCore tests...\033[0m"
 	@for test_exec in $(CORE_EXECUTABLES); do ./$$test_exec; done
 	@echo "\033[93;4mUtility tests...\033[0m" 

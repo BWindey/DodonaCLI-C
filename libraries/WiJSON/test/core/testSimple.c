@@ -1,13 +1,11 @@
 #include <assert.h>
 #include <string.h>
 
-#include "../include/wiJSON.h"
-#include "../../WiEnrich/include/enrich.h"
+#include "../../include/wiJSON.h"
+#include "../../../WiEnrich/include/enrich.h"
 
 int main() {
-	char startMsg[] = "[UNDER]Testing simple values...[/]";
-	wiEnrich(startMsg);
-	printf("\n%s\n", startMsg);
+	printf("Testing simple values...\n");
 
 	wiValue* testInt = parseJSONString("993214241");
 	wiValue* testBool = parseJSONString("false");

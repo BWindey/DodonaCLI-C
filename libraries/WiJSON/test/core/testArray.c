@@ -1,16 +1,15 @@
 #include <assert.h>
 #include <string.h>
 
-#include "../include/wiJSON.h"
-#include "../../WiEnrich/include/enrich.h"
+#include "../../include/wiJSON.h"
+#include "../../../WiEnrich/include/enrich.h"
 
 int main() {
-	char startMsg[] = "[UNDER]Testing simple array...[/]";
-	wiEnrich(startMsg);
-	printf("\n%s\n", startMsg);
-	const char arrayString[] = "[ 1, -32.4, \"Hello, World!\", true, false, -32e4, null]";
-	wiValue* testArray = parseJSONString(arrayString);
-	printf(" > Object = '%s'\n", arrayString);
+	printf("Testing simple array...\n");
+
+	wiValue* testArray = parseJSONString(
+			"[ 1, -32.4, \"Hello, World!\", true, false, -32e4, null]"
+	);
 
 	assert(testArray->_type == WIARRAY);
 	assert(testArray->contents.arrayVal != NULL);
