@@ -8,8 +8,8 @@ SRCDIR = src
 INCDIR = include
 OBJDIR = obj
 LIBDIR = lib
-TESTDIR = test
 WIENRICH_DIR = ../WiEnrich
+
 
 # Library names
 LIBRARY = $(LIBDIR)/libwiJSON.a
@@ -19,9 +19,6 @@ WIENRICH_LIB = $(WIENRICH_DIR)/lib/libwienrich.a
 SRC_FILES = $(wildcard $(SRCDIR)/*.c)
 OBJ_FILES = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRC_FILES))
 
-# Test files and their executables
-TEST_SRC_FILES = $(wildcard $(TESTDIR)/*.c)
-TEST_EXECUTABLES = $(patsubst $(TESTDIR)/%.c,$(TESTDIR)/%.out,$(TEST_SRC_FILES))
 
 # Default target
 all: $(LIBRARY)
@@ -44,16 +41,14 @@ $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
 # Rule to build and run tests
-test: $(WIENRICH_LIB) $(TEST_EXECUTABLES)
-	for test_exec in $(TEST_EXECUTABLES); do ./$$test_exec; done
+test: $(LIBRARY) $(WIENRICH_LIB)
+	$(MAKE) -C test
 
-# Rule to compile test executables
-$(TESTDIR)/%.out: $(TESTDIR)/%.c $(LIBRARY) $(WIENRICH_LIB)
-	$(CC) $(CFLAGS) $< -o $@ -L$(LIBDIR) -lwiJSON $(LDFLAGS)
 
 # Clean up
 clean:
 	rm -rf $(OBJDIR) $(LIBRARY) $(TEST_EXECUTABLES) $(LIBDIR)
 	$(MAKE) -C $(WIENRICH_DIR) clean
+	$(MAKE) -C test clean
 
 .PHONY: test clean all
