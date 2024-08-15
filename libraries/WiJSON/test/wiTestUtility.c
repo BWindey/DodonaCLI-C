@@ -12,8 +12,6 @@ void testSimpleObject();
 
 void testObject1();
 void testObject2();
-/* void testObject3();
-void testObject4(); */
 
 int main() {
 	char msg[] = "[BRIGHT-YELLOW][UNDER]Utility tests...[/]\n";
@@ -24,8 +22,6 @@ int main() {
 	
 	testObject1();
 	testObject2();
-	/* testObject3();
-	testObject4(); */
 
 	char message[] = "[BLACK][ON BRIGHT-GREEN]All utility tests passed.[/]\n\n";
 	wiEnrich(message);
