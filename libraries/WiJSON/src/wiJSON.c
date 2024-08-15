@@ -178,6 +178,14 @@ void parseString(FILE* jsonFile, wiValue* parent) {
 }
 
 /*
+ * Small helper function for parseNumber
+ */
+bool isValidForNumber(const char c) {
+	return isdigit(c) || c == 'e' || c == 'E' 
+		|| c == '+' || c == '-' || c == '.';
+}
+
+/*
  * Tries to parse a string value and assign it to the wiValue* parent contents.
  *
  * Asserts when the FILE* doesn't point to a '"' 
@@ -194,7 +202,7 @@ void parseNumber(FILE* jsonFile, wiValue* parent) {
 
 	unsigned int index = 0;
 
-	while (c != EOF && index < 22 && (isdigit(c) || c == 'e' || c == 'E' || c == '.')) {
+	while (c != EOF && index < 22 && isValidForNumber(c)) {
 		buffer[index] = c;
 		c = fgetc(jsonFile);
 		index++;
