@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,314 +7,348 @@
 
 #include "../include/wiJSON.h"
 
-// Forward declarations
+// Forward declarations for internal functions
 bool isBlank(const char);
-unsigned int jumpBlankChars(const char*, unsigned int);
+void jumpBlankChars(FILE*);
 
-unsigned int parseArray	(const char*, unsigned int, wiValue*);
-unsigned int parseBool	(const char*, unsigned int, wiValue*);
-unsigned int parseNull	(const char*, unsigned int, wiValue*);
-unsigned int parseNumber(const char*, unsigned int, wiValue*);
-unsigned int parsePair	(const char*, unsigned int, wiValue*);
-unsigned int parseString(const char*, unsigned int, wiValue*);
-unsigned int parseValue	(const char*, unsigned int, wiValue*);
-
+void parseArray	(FILE*, wiValue*);
+void parseBool	(FILE*, wiValue*);
+void parseNull	(FILE*, wiValue*);
+void parseNumber(FILE*, wiValue*);
+void parsePair	(FILE*, wiValue*);
+void parseString(FILE*, wiValue*);
+void parseValue	(FILE*, wiValue*);
 
 /*
- * Entrypoint of the library.
- * Takes in the jsonString and returns a wiValue pointer
+ * Entrypoint for parsing strings.
+ * Returns a wiValue* object that holds all the JSON data.
+ *
+ * Will assert when it finds invalid JSON.
+ *
+ * Under the hood, this will convert the string to a FILE* and call the
+ * parser for FILE's.
  */
-wiValue* parseJSONString(const char *jsonString) {
-	wiValue* root = (wiValue*)malloc(sizeof(wiValue));
+wiValue* parseJSONString(const char* jsonString) {
+	unsigned long stringLength = strlen(jsonString);
 
-	// Start index at first non-blank char
-	unsigned int index = jumpBlankChars(jsonString, 0);
+	FILE* stringAsFile = fmemopen((void*) jsonString, stringLength, "r");
 
-	parseValue(jsonString, index, root);
+	return parseJSONFile(stringAsFile);
+}
+
+/*
+ * Entrypoint for parsing files.
+ * Returns a wiValue* object that holds all the JSON data.
+ *
+ * Will assert when it finds invalid JSON.
+ */
+wiValue* parseJSONFile(FILE* jsonFile) {
+	wiValue* root = (wiValue*) malloc(sizeof(wiValue));
+
+	parseValue(jsonFile, root);
 
 	return root;
 }
 
-
 /*
- * Parses a JSON-value, whether it is an int, string, ... or array 
- * (will delegate)
+ *	Determine which type of value it is, 
+ *	and call the right function to parse that value.
  *
- * Returns the index of the last parsed character in the jsonString
+ * 	Asserts when the file-pointer is on a blank space.
  */
-unsigned int parseValue(const char *jsonString, unsigned int index, wiValue* parent) {
-	// Enforce we can start parsing
-	assert(!isBlank(jsonString[index]));
+void parseValue(FILE* jsonFile, wiValue* parent) {
+	// Peek the current character, 
+	// and put it back because some functions will need it.
+	// Mainly the Bool, Null and Number functions.
+	char c = fgetc(jsonFile);
+	ungetc(c, jsonFile);
+	assert(!isBlank(c));
 
-	switch (jsonString[index]) {
-		case '{':	// Object
-			index = parsePair(jsonString, index, parent);
+	switch (c) {
+		case '{': 	// Object
+			parsePair(jsonFile, parent);
 			break;
 
-		case '[':	// Array
-			index = parseArray(jsonString, index, parent);
+		case '[': 	// Array
+			parseArray(jsonFile, parent);
 			break;
 
-		case '"':	// String
-			index = parseString(jsonString, index, parent);
+		case '"':
+			parseString(jsonFile, parent);
 			break;
 
-		case 't':	// Boolean (fall-through)
+		case 't':	// Boolean
 		case 'f':
-			index = parseBool(jsonString, index, parent);
+			parseBool(jsonFile, parent);
 			break;
 
-		case 'n': 	// null
-			index = parseNull(jsonString, index, parent);
+		case 'n': 	// Null	
+			parseNull(jsonFile, parent);
 			break;
 
-		default:	// Try for a number
-			index = parseNumber(jsonString, index, parent);
+		default: 	// Try parsing number
+			parseNumber(jsonFile, parent);
 			break;
 	}
-
-	return index;
 }
 
 /*
- * Tries to parse a boolean value and assign it to wiValue* parent contents.
+ * Tries to parse a boolean value and assign it to the wiValue* parent contents.
  *
- * Returns the index of the next non-blank character after the boolean value.
- *
- * Asserts if it doesn't find "true" or "false" from the cursor,
- * or when the boolean value is followed by an illegal character (for json).
+ * Asserts when it couldn't find "true" or "false",
+ * including when it encounters an EOF before finishing parsing.
  */
-unsigned int parseBool(const char* jsonString, unsigned int index, wiValue* parent) {
-	if (strncmp(jsonString + index, "true", 4) == 0) {
+void parseBool(FILE* jsonFile, wiValue* parent) {
+	char buffer[6];
+	char c = 0;
+
+	int i = 0;
+
+	// Read the first four letters
+	while (i < 4) {
+		c = fgetc(jsonFile);
+		assert(c != EOF);
+		buffer[i] = c;
+		i++;
+	}
+
+	if (c == 'e') {
+		buffer[i] = '\0';
+		assert(strcmp(buffer, "true") == 0);
 		parent->contents.boolVal = true;
-		index += 4;		// Length of "true"
 
 	} else {
-		assert(strncmp(jsonString + index, "false", 5) == 0);
-		parent->contents.boolVal = false;
-		index += 5;		// Length of "false"
+		c = fgetc(jsonFile);
+		assert(c != EOF);
+		buffer[i] = c;
+		buffer[i + 1] = '\0';
+		assert(strcmp(buffer, "false") == 0);
 
+		parent->contents.boolVal = false;
 	}
 	parent->_type = WIBOOL;
-
-	return jumpBlankChars(jsonString, index);
+	jumpBlankChars(jsonFile);
 }
 
 /*
- * Tries to parse a string and assign it to the wiValue* parent contents.
- * 
- * Returns the index of the next non-blank character after the boolean value.
+ * Tries to parse a string value and assign it to the wiValue* parent contents.
  *
- * Asserts if the index isn't standing on the opening '"',
- * and when it can't find a closing quote.
+ * Asserts when the FILE* doesn't point to a '"' 
+ * and when it couldn't find a closing '"' before EOF.
  */
-unsigned int parseString(const char* jsonString, unsigned int index, wiValue* parent) {
-	assert(jsonString[index] == '"');
+void parseString(FILE* jsonFile, wiValue* parent) {
+	char c = fgetc(jsonFile);
+	assert(c == '"');
 
-	// Already move index 1 forward, as we don't need the opening quote
+	unsigned int buffersize = 16;
+	char* stringVal = (char*) malloc(sizeof(char) * buffersize);
+	assert(stringVal != NULL);
+
+	unsigned int index = 0;
+
+	// "Cursor" still stands on the opening quote
+	c = fgetc(jsonFile);
+	stringVal[index] = c;
 	index++;
 
-	// Find closing '"'
-	unsigned int closingIndex = index + 1;
-	while (jsonString[closingIndex] != '\0' && jsonString[closingIndex] != '"') {
-		closingIndex++;
+	while (c != EOF && c != '"') {
+		c = fgetc(jsonFile);
+		stringVal[index] = c;
+		index++;
+
+		// Re-allocate to larger string if needed
+		if (index >= buffersize - 1) {
+			buffersize *= 2;
+			stringVal = (char*) realloc((void*) stringVal, sizeof(char) * buffersize);
+			assert(stringVal != NULL);
+		}
 	}
-
-	assert(jsonString[closingIndex] == '"');
-
-	unsigned int substringLength = closingIndex - index;
-
-	// length+1 for null-byte
-	char* stringVal = (char*)malloc(sizeof(char) * (substringLength + 1));
-	strncpy(stringVal, jsonString + index, substringLength);
-	stringVal[substringLength] = '\0';
+	assert(c == '"');
+	stringVal[index - 1] = '\0';
 
 	parent->_type = WISTRING;
 	parent->contents.stringVal = stringVal;
 
-	// To check behind string, we move 1 further from the closing quote
-	closingIndex++;
-
-	return jumpBlankChars(jsonString, closingIndex);
+	c = fgetc(jsonFile);
+	if (isBlank(c)) {
+		jumpBlankChars(jsonFile);
+	} else {
+		ungetc(c, jsonFile);
+	}
 }
 
 /*
- * Tries to parse a json-number (float or int).
+ * Tries to parse a string value and assign it to the wiValue* parent contents.
  *
- * Returns the index of the next non-blank char after the number
- *
- * Asserts when index isn't at a valid json-number-character,
- * or when it fails to parse the number (non-valid number).
+ * Asserts when the FILE* doesn't point to a '"' 
+ * and when it couldn't find a closing '"' before EOF.
  */
-unsigned int parseNumber(const char* jsonString, unsigned int index, wiValue* parent) {
-	assert(
-			jsonString[index] == '+' 
-			|| jsonString[index] == '-'
-			|| (jsonString[index] >= '0' && jsonString[index] <= '9')
-	);
+void parseNumber(FILE* jsonFile, wiValue* parent) {
+	char c = fgetc(jsonFile);
+	assert(c != EOF);
+	assert(c == '+' || c == '-' || (c >= '0' && c <= '9'));
 
 	bool isInteger = true;
-	unsigned int closingIndex = index + 1;
-	while (
-		jsonString[closingIndex] != '\0' 
-		&& !isBlank(jsonString[closingIndex])
-		&& jsonString[closingIndex] != ','
-		&& jsonString[closingIndex] != ']'
-		&& jsonString[closingIndex] != '}'
-	) {
-		if (
-			jsonString[closingIndex] == '.' 
-			|| jsonString[closingIndex] == 'e'
-			|| jsonString[closingIndex] == 'E'
-		) {
+	// Largest bool is 22 long, + 1 '\0' at the end
+	char buffer[23];
+
+	unsigned int index = 0;
+
+	while (c != EOF && index < 22 && (isdigit(c) || c == 'e' || c == 'E' || c == '.')) {
+		buffer[index] = c;
+		c = fgetc(jsonFile);
+		index++;
+
+		if (c == '.' || c == 'e' || c == 'E') {
 			isInteger = false;
 		}
-
-		closingIndex++;
 	}
 
-	char number[closingIndex - index];
-	strncpy(number, jsonString + index, closingIndex - index);
-	number[closingIndex - index] = '\0';
+	// Check next character, shouldn't be numerical cause it won't get parsed
+	assert(c == EOF || isBlank(c) || c == ',' || c == ']' || c == '}');
+	ungetc(c, jsonFile);
+	jumpBlankChars(jsonFile);
 
+	buffer[index] = '\0';
+
+	// Parse number
 	char* end;
-
 	if (isInteger) {
-		long intVal = strtol(number, &end, 10);
-
+		long intval = strtol(buffer, &end, 10);
 		parent->_type = WIINT;
-		parent->contents.intVal = intVal;
+		parent->contents.intVal = intval;
 	} else {
-		double floatVal = strtod(number, &end);
-
+		double floatVal = strtod(buffer, &end);
 		parent->_type = WIFLOAT;
 		parent->contents.floatVal = floatVal;
 	}
-
-	// Check if it was a real parseable number
 	assert(*end == '\0');
-
-	return jumpBlankChars(jsonString, closingIndex);
 }
 
-unsigned int parsePair(const char* jsonString, unsigned int index, wiValue* parent) {
-	assert(jsonString[index] == '{');
+/*
+ * Tries to parse key-value pairs and assign it to the wiValue* parent contents.
+ *
+ * Asserts when the FILE* doesn't point to a '{',
+ * when it can't find a ':' after a key,
+ * when it can't find a ',' after a value,
+ * and when it couldn't find a closing '}' before EOF.
+ */
+void parsePair(FILE* jsonFile, wiValue* parent) {
+	char c = fgetc(jsonFile);
+	assert(c == '{');
 
 	parent->_type = WIPAIR;
 	wiPair* currentPair = NULL;
-	wiPair* previousPair;
+	wiPair* previousPair = NULL;
 
-	wiValue* value;
-	// Can reuse this dummy wiValue, so only initialise once
+	wiValue* value = NULL;
 	wiValue* dummyForKey = (wiValue*) malloc(sizeof(wiValue));
 
-	while (jsonString[index] != '\0' && jsonString[index] != '}') {
+	while (c != EOF && c != '}') {
 		previousPair = currentPair;
+
 		currentPair = (wiPair*) malloc(sizeof(wiPair));
 		currentPair->nextPair = NULL;
+		currentPair->value = NULL;
+		currentPair->key = NULL;
 
-		// Parse key
-		// Doing this with the existing parseJSONString to avoid duplication
-		index = jumpBlankChars(jsonString, index + 1);
-		index = parseString(jsonString, index, dummyForKey);
+		// Get key with dummy-value
+		jumpBlankChars(jsonFile);
+		parseString(jsonFile, dummyForKey);
 		currentPair->key = dummyForKey->contents.stringVal;
 
-		// Check correctness
-		assert(jsonString[index] == ':');
+		// Jump the ':'
+		c = fgetc(jsonFile);
+		assert(c == ':');
+		jumpBlankChars(jsonFile);
 
 		// Parse value
 		value = (wiValue*) malloc(sizeof(wiValue));
-		index = jumpBlankChars(jsonString, index + 1);
-		index = parseValue(jsonString, index, value);
+		parseValue(jsonFile, value);
 		currentPair->value = value;
 
-		// Check correctness and prepare for parsing next if necessary
-		assert(jsonString[index] == ',' || jsonString[index] == '}');
+		c = fgetc(jsonFile);
+		assert(c == ',' || c == '}');
 
-		// Link pair to parent/previous pair
+		// Link the pair to parent/previous pair
 		if (previousPair == NULL) {
-			// Only happens with first pair
 			parent->contents.pairVal = currentPair;
 		} else {
 			previousPair->nextPair = currentPair;
 		}
 	}
-
 	free(dummyForKey);
 
-	return jumpBlankChars(jsonString, index + 1);
+	assert(c == '}');
+
+	jumpBlankChars(jsonFile);
 }
 
 /*
- * Tries to parse a json-array starting from 'index'.
+ * Tries to parse array elements and assign it to the wiValue* parent contents.
  *
- * Returns the index of the next non-blank character after the end of the array
- *
- * Asserts when initial jsonString at index != '[', 
- * and when it can't find a closing bracket before a null-byte,
- * and when there is no comma or closing bracket after each array-element.
- * (All disregarding white-space)
+ * Asserts when the FILE* doesn't point to a '[',
+ * when it couldn't find comma's between array-elements,
+ * and when it couldn't find a closing ']' before EOF.
  */
-unsigned int parseArray(const char* jsonString, unsigned int index, wiValue* parent) {
-	assert(jsonString[index] == '[');
-
-	// Already move index 1 forward, as we don't need the opening bracket
-	index++;
-
-	index = jumpBlankChars(jsonString, index);
+void parseArray(FILE* jsonFile, wiValue* parent) {
+	char c = fgetc(jsonFile);
+	assert(c == '[');
 
 	parent->_type = WIARRAY;
-	wiArrayEl* currentElement = NULL;
-	wiValue* currentElementValue;
 
+	wiArrayEl* currentElement = NULL;
 	wiArrayEl* previousElement = NULL;
 
-	// Parse every json-value in the array
-	while (jsonString[index] != '\0' && jsonString[index] != ']') {
+	wiValue* currentValue = NULL;
+
+	while (c != EOF && c != ']') {
 		previousElement = currentElement;
 
 		currentElement = (wiArrayEl*) malloc(sizeof(wiArrayEl));
-		currentElementValue = (wiValue*) malloc(sizeof(wiValue));
-
+		currentElement->elementVal = NULL;
 		currentElement->nextElement = NULL;
 
-		// Parse the actual elementValue
-		index = parseValue(jsonString, index, currentElementValue);
-		currentElement->elementVal = currentElementValue;
+		currentValue = (wiValue*) malloc(sizeof(wiValue));
+
+		jumpBlankChars(jsonFile);
+		parseValue(jsonFile, currentValue);
+
+		currentElement->elementVal = currentValue;
 		
-		assert(jsonString[index] == ',' || jsonString[index] == ']');
+		c = fgetc(jsonFile);
+		assert(c == ',' || c == ']');
 
-		if (jsonString[index] == ',') {
-			index++;
-			index = jumpBlankChars(jsonString, index);
-		}
-
+		// Link to parent/previous element
 		if (previousElement == NULL) {
-			// Only happens with the first element
 			parent->contents.arrayVal = currentElement;
 		} else {
 			previousElement->nextElement = currentElement;
 		}
 	}
-
-	return jumpBlankChars(jsonString, index + 1);
+	assert(c == ']');
+	jumpBlankChars(jsonFile);
 }
 
 /*
- * Tries to parse 'null' (NULL) and asserts if it isn't the case.
- * This can only assert on a non-valid json-string
+ * Tries to parse "null" and assigns it to the wiValue* parent contents.
  *
- * It sets the value and type of the wiValue* parent, 
- * and returns the index of the next non-blank character after "null"
+ * Asserts when it doesn't read "null".
  */
-unsigned int parseNull(const char* jsonString, unsigned int index, wiValue* parent) {
-	assert(strncmp(jsonString + index, "null", 4) == 0);
-
+void parseNull(FILE* jsonFile, wiValue* parent) {
+	assert(fgetc(jsonFile) == 'n');
+	assert(fgetc(jsonFile) == 'u');
+	assert(fgetc(jsonFile) == 'l');
+	assert(fgetc(jsonFile) == 'l');
 	parent->_type = WINULL;
-
-	return jumpBlankChars(jsonString, index + 4);
+	jumpBlankChars(jsonFile);
 }
 
+/*
+ * Free all the allocated memory for the passed wiValue*.
+ * It's advised to call this when you don't need your JSON anymore, 
+ * because it can take up a bit of space. 
+ * */
 void freeEverything(wiValue* root) {
 	switch (root->_type) {
 		case WISTRING:
@@ -360,19 +395,26 @@ void freeEverything(wiValue* root) {
 	free(root);
 }
 
-
 /*
- * Returns the index of the first non-blank character
- * starting from 'index'
+ * Advances the FILE* untill it finds a non-blank char (see isBlank()).
  */
-unsigned int jumpBlankChars(const char* string, unsigned int index) {
-	while (isBlank(string[index]) && string[index] != '\0') {
-		index++;
-	}
+void jumpBlankChars(FILE* file) {
+	char c = fgetc(file);
 
-	return index;
+	while (c != EOF && isBlank(c)) {
+		c = fgetc(file);
+	}
+	// Place the last one back, as it is not blank.
+	ungetc(c, file);
 }
 
+/*
+ * Peeks at the fileptr and returns whether it points to a blank character.
+ * Blank characters are defined as ' ', '\t', '\n' and '\r'.
+ *
+ * This does NOT check if the pointer points to EOF, 
+ * you should check this seperatly.
+ */
 bool isBlank(const char c) {
 	return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 }
