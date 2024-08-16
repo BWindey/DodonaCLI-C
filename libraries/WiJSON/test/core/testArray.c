@@ -4,9 +4,7 @@
 #include "../../include/wiJSON.h"
 #include "../../../WiEnrich/include/enrich.h"
 
-int main() {
-	printf("Testing simple array...\n");
-
+void testSimpleArray() {
 	wiValue* testArray = parseJSONString(
 			"[ 1, -32.4, \"Hello, World!\", true, false, -32e4, null]"
 	);
@@ -57,6 +55,12 @@ int main() {
 	assert(currentElement->elementVal->_type == WINULL);
 
 	freeEverything(testArray);
+}
+
+int main() {
+	printf("Testing simple array...\n");
+
+	testSimpleArray();
 
 	char message[] = "Simple array tests [BRIGHT-GREEN]succeeded[/].\n\n";
 	wiEnrich(message);
