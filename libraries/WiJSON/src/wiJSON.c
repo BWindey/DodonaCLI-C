@@ -29,11 +29,14 @@ void parseValue	(FILE*, wiValue*);
  * parser for FILE's.
  */
 wiValue* parseJSONString(const char* jsonString) {
-	unsigned long stringLength = strlen(jsonString);
+	FILE* stringAsFile = fmemopen((void*) jsonString, strlen(jsonString), "r");
+	assert(stringAsFile != NULL);
 
-	FILE* stringAsFile = fmemopen((void*) jsonString, stringLength, "r");
+	wiValue* root = parseJSONFile(stringAsFile);
 
-	return parseJSONFile(stringAsFile);
+	fclose(stringAsFile);
+
+	return root;
 }
 
 /*
