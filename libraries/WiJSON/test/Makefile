@@ -19,12 +19,24 @@ UTILITY_EXECUTABLES = $(patsubst $(UTILITY_DIR)/%.c,$(OUT_UTILITY_DIR)/%.out,$(U
 
 
 # Default target
-all: $(CORE_EXECUTABLES) $(UTILITY_EXECUTABLES)
+all: core utility
+
+# Only test core-tests
+core: $(CORE_EXECUTABLES)
 	@echo ""
-	@echo "\033[93;4mCore tests...\033[0m"
-	@for test_exec in $(CORE_EXECUTABLES); do ./$$test_exec; done
-	@echo "\033[93;4mUtility tests...\033[0m" 
-	@for test_exec in $(UTILITY_EXECUTABLES); do ./$$test_exec; done
+	@echo "\033[93;1mCore tests...\033[0m"
+	@for test_exec in $(CORE_EXECUTABLES); do \
+		./$$test_exec; \
+	done
+
+# Only test utility-tests
+utility: $(UTILITY_EXECUTABLES)
+	@echo ""
+	@echo "\033[93;1mUtility tests...\033[0m" 
+	@for test_exec in $(UTILITY_EXECUTABLES); do \
+		./$$test_exec; \
+	done
+
 
 # Compile core tests
 $(OUT_CORE_DIR)/%.out: $(CORE_DIR)/%.c | $(OUT_CORE_DIR)
