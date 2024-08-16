@@ -1,0 +1,14 @@
+{
+  "id": 36011,
+  "name": "week 05: Python: tekstbestanden",
+  "description": "test-description",
+  "visibility": "open",
+  "visibility_start": null,
+  "order": 4,
+  "created_at": "2024-02-08T14:51:07.000+01:00",
+  "updated_at": "2024-03-11T14:34:01.000+01:00",
+  "deadline": "2024-03-19T22:00:00.000+01:00",
+  "url": "https://dodona.be/nl/series/36011.json",
+  "course": "https://dodona.be/nl/courses/3355.json",
+  "exercises": "https://dodona.be/nl/series/36011/activities.json"
+}

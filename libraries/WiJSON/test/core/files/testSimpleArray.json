@@ -1,0 +1,12 @@
+[
+	"First element",
+	"Second element",
+	1234,
+	-1234,
+	-32e39,
+	true,
+	true,
+	false,
+	"One before last",
+	null
+]
