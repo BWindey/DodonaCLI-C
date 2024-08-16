@@ -36,7 +36,7 @@ void testSimple() {
 
 	assert(strcmp(pair->key, "key3") == 0);
 	assert(pair->value->_type == WISTRING);
-	assert(strcmp(pair->value->contents.stringVal, "Hello, World!"));
+	assert(strcmp(pair->value->contents.stringVal, "Hello, World!") == 0);
 
 	pair = pair->nextPair;
 	assert(pair != NULL);
