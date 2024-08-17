@@ -1,59 +1,75 @@
-#include <assert.h>
-#include <string.h>
-
 #include "../../include/wiJSON.h"
 #include "../../../WiEnrich/include/enrich.h"
+#include "../../../WiTesting/wiTest.h"
+
+const char* enumToString(wiType type) {
+	switch (type) {
+        case WIARRAY: return "WIARRAY";
+        case WIBOOL: return "WIBOOL";
+        case WIFLOAT: return "WIFLOAT";
+        case WIINT: return "WIINT";
+        case WINULL: return "WINULL";
+        case WIPAIR: return "WIPAIR";
+        case WISTRING: return "WISTRING";
+		default: return "WI_UNKNOWN";
+    }
+}
 
 void testInt() {
 	wiValue* testInt1 = parseJSONString("993214241");
-	assert(testInt1->_type == WIINT);
-	assert(testInt1->contents.intVal == 993214241);
+	wiTestEnum(WIINT, testInt1->_type, enumToString);
+	wiTestInt(993214241, testInt1->contents.intVal);
 	freeEverything(testInt1);
 
 	wiValue* testInt2 = parseJSONString("-13");
-	assert(testInt2->_type == WIINT);
-	assert(testInt2->contents.intVal == -13);
+	wiTestEnum(WIINT, testInt2->_type, enumToString);
+	wiTestInt(-13, testInt2->contents.intVal);
 	freeEverything(testInt2);
 
 	wiValue* testInt3 = parseJSONString("1234567890");
-	assert(testInt3->_type == WIINT);
-	assert(testInt3->contents.intVal == 1234567890);
+	wiTestEnum(WIINT, testInt3->_type, enumToString);
+	wiTestInt(1234567890, testInt3->contents.intVal);
 	freeEverything(testInt3);
 }
 
 void testBool() {
 	wiValue* testTrue = parseJSONString("true");
-	assert(testTrue->_type == WIBOOL);
-	assert(testTrue->contents.boolVal == true);
+	wiTestEnum(WIBOOL, testTrue->_type, enumToString);
+	wiTestBool(true, testTrue->contents.boolVal);
 	freeEverything(testTrue);
 
 	wiValue* testFalse = parseJSONString("false");
-	assert(testFalse->_type == WIBOOL);
-	assert(testFalse->contents.boolVal == false);
+	wiTestEnum(WIBOOL, testFalse->_type, enumToString);
+	wiTestBool(false, testFalse->contents.boolVal);
 	freeEverything(testFalse);
 }
 
 void testString() {
-	wiValue* testString = parseJSONString("\"BEGINhiweonfioewfamcl;mkclm oqfnieowq;mfkl;w mfkfo;wqnmcEND\"");
-	assert(testString->_type == WISTRING);
-	assert(strcmp(testString->contents.stringVal, "BEGINhiweonfioewfamcl;mkclm oqfnieowq;mfkl;w mfkfo;wqnmcEND") == 0);
+	wiValue* testString = parseJSONString(
+		"\"BEGINhiweonfioewfamcl;mkclm oqfnieowq;mfkl;w mfkfo;wqnmcEND\""
+	);
+	wiTestEnum(WISTRING, testString->_type, enumToString);
+	wiTestString(
+		"BEGINhiweonfioewfamcl;mkclm oqfnieowq;mfkl;w mfkfo;wqnmcEND",
+		testString->contents.stringVal
+	);
 	freeEverything(testString);
 }
 
 void testFloat() {
 	wiValue* testLargeNegative = parseJSONString("-3.21e5");
-	assert(testLargeNegative->_type == WIFLOAT);
-	assert(testLargeNegative->contents.floatVal == -3.21e5);
+	wiTestEnum(WIFLOAT, testLargeNegative->_type, enumToString);
+	wiTestFloat(-3.21e5, testLargeNegative->contents.floatVal);
 	freeEverything(testLargeNegative);
 
 	wiValue* testLargePositive = parseJSONString("4.128e32");
-	assert(testLargePositive->_type == WIFLOAT);
-	assert(testLargePositive->contents.floatVal == 4.128e32);
+	wiTestEnum(WIFLOAT, testLargePositive->_type, enumToString);
+	wiTestFloat(4.128e32, testLargePositive->contents.floatVal);
 	freeEverything(testLargePositive);
 
 	wiValue* testPi = parseJSONString("3.141592");
-	assert(testPi->_type == WIFLOAT);
-	assert(testPi->contents.floatVal == 3.141592);
+	wiTestEnum(WIFLOAT, testPi->_type, enumToString);
+	wiTestFloat(3.141592, testPi->contents.floatVal);
 	freeEverything(testPi);
 }
 
@@ -65,9 +81,19 @@ int main() {
 	testString();
 	testFloat();
 
-	char message[] = "Simple tests [BRIGHT-GREEN]succeeded[/].\n\n";
-	wiEnrich(message);
-	printf("%s", message);
+	if (wiFailedTests > 1) {
+		char message[] = "simple value-tests [BRIGHT-RED]failed[/].";
+		wiEnrich(message);
+		printf("%d %s\n\n", wiFailedTests, message);
+	} else if (wiFailedTests == 1) {
+		char message[] = "simple value-test [BRIGHT-RED]failed[/].";
+		wiEnrich(message);
+		printf("%d %s\n\n", wiFailedTests, message);
+	} else {
+		char message[] = "Simple tests [BRIGHT-GREEN]succeeded[/].";
+		wiEnrich(message);
+		printf("%s\n\n", message);
+	}
 
 	return 0;
 }
