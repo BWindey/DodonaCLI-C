@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ctype.h>
 #include <locale.h>
 #include <math.h>
 #include <stdio.h>
@@ -68,4 +69,25 @@ static int wiFailedTests = 0;
 	if ((EXPECTED) != (GOT)) { \
 		_wiTest(#EXPECTED, #GOT, "'%c'", (char)GOT); \
 	} \
+}
+
+/*
+ * A standard way to print the results.
+ * 
+ * char* testName: name of test used to print out the messages.
+ */
+static inline void wiPrintResult(char* testName) {
+	if (wiFailedTests > 1) {
+		printf("%d %s tests \033[91mfailed\033[0m.\n\n", wiFailedTests, testName);
+
+	} else if (wiFailedTests == 1) {
+		printf("1 %s test \033[91mfailed\033[0m.\n\n", testName);
+
+	} else {
+		printf(
+			"%c%s tests \033[92mpassed\033[0m.\n\n", 
+			toupper(testName[0]),
+			&testName[1]
+		);
+	}
 }
