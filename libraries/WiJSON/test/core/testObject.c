@@ -2,18 +2,31 @@
 #include <string.h>
 
 #include "../../include/wiJSON.h"
-#include "../../../WiEnrich/include/enrich.h"
+#include "../../../WiTesting/wiTest.h"
+
+const char* enumToString(wiType type) {
+	switch (type) {
+        case WIARRAY: return "WIARRAY";
+        case WIBOOL: return "WIBOOL";
+        case WIFLOAT: return "WIFLOAT";
+        case WIINT: return "WIINT";
+        case WINULL: return "WINULL";
+        case WIPAIR: return "WIPAIR";
+        case WISTRING: return "WISTRING";
+		default: return "WI_UNKNOWN";
+    }
+}
 
 void testObject1() {
 	// Test 1: Simple object with one key-value pair (string)
 	wiValue* testObject1 = parseJSONString("{\"key1\":\"value1\"}");
-	assert(testObject1->_type == WIPAIR);
+	wiTestEnum(WIPAIR, testObject1->_type, enumToString);
 	assert(testObject1->contents.pairVal != NULL);
 
 	wiPair* pair1 = testObject1->contents.pairVal;
-	assert(strcmp(pair1->key, "key1") == 0);
-	assert(pair1->value->_type == WISTRING);
-	assert(strcmp(pair1->value->contents.stringVal, "value1") == 0);
+	wiTestString("key1", pair1->key);
+	wiTestEnum(WISTRING, pair1->value->_type, enumToString);
+	wiTestString("value1", pair1->value->contents.stringVal);
 
 	freeEverything(testObject1);
 }
@@ -21,19 +34,19 @@ void testObject1() {
 void testObject2() {
 	// Test 2: Simple object with multiple key-value pairs (int and string)
 	wiValue* testObject2 = parseJSONString("{ \"key1\": 42, \"key2\": \"value2\" }");
-	assert(testObject2->_type == WIPAIR);
+	wiTestEnum(WIPAIR, testObject2->_type, enumToString);
 	assert(testObject2->contents.pairVal != NULL);
 
 	wiPair* pair2_kv1 = testObject2->contents.pairVal;
-	assert(strcmp(pair2_kv1->key, "key1") == 0);
-	assert(pair2_kv1->value->_type == WIINT);
-	assert(pair2_kv1->value->contents.intVal == 42);
+	wiTestString("key1", pair2_kv1->key);
+	wiTestEnum(WIINT, pair2_kv1->value->_type, enumToString);
+	wiTestInt(42, pair2_kv1->value->contents.intVal);
 
 	wiPair* pair2_kv2 = pair2_kv1->nextPair;
 	assert(pair2_kv2 != NULL);
-	assert(strcmp(pair2_kv2->key, "key2") == 0);
-	assert(pair2_kv2->value->_type == WISTRING);
-	assert(strcmp(pair2_kv2->value->contents.stringVal, "value2") == 0);
+	wiTestString("key2", pair2_kv2->key);
+	wiTestEnum(WISTRING, pair2_kv2->value->_type, enumToString);
+	wiTestString("value2", pair2_kv2->value->contents.stringVal);
 
 	freeEverything(testObject2);
 }
@@ -41,25 +54,25 @@ void testObject2() {
 void testObject3() {
 	// Test 3: Simple object with multiple key-value pairs (float, bool, string)
 	wiValue* testObject3 = parseJSONString("{ \"key1\": 3.14, \"key2\": true, \"key3\": \"value3\" }");
-	assert(testObject3->_type == WIPAIR);
+	wiTestEnum(WIPAIR, testObject3->_type, enumToString);
 	assert(testObject3->contents.pairVal != NULL);
 
 	wiPair* pair3_kv1 = testObject3->contents.pairVal;
-	assert(strcmp(pair3_kv1->key, "key1") == 0);
-	assert(pair3_kv1->value->_type == WIFLOAT);
-	assert(pair3_kv1->value->contents.floatVal == 3.14);
+	wiTestString("key1", pair3_kv1->key);
+	wiTestEnum(WIFLOAT, pair3_kv1->value->_type, enumToString);
+	wiTestFloat(3.14, pair3_kv1->value->contents.floatVal);
 
 	wiPair* pair3_kv2 = pair3_kv1->nextPair;
 	assert(pair3_kv2 != NULL);
-	assert(strcmp(pair3_kv2->key, "key2") == 0);
-	assert(pair3_kv2->value->_type == WIBOOL);
-	assert(pair3_kv2->value->contents.boolVal == true);
+	wiTestString("key2", pair3_kv2->key);
+	wiTestEnum(WIBOOL, pair3_kv2->value->_type, enumToString);
+	wiTestBool(true, pair3_kv2->value->contents.boolVal);
 
 	wiPair* pair3_kv3 = pair3_kv2->nextPair;
 	assert(pair3_kv3 != NULL);
-	assert(strcmp(pair3_kv3->key, "key3") == 0);
-	assert(pair3_kv3->value->_type == WISTRING);
-	assert(strcmp(pair3_kv3->value->contents.stringVal, "value3") == 0);
+	wiTestString("key3", pair3_kv3->key);
+	wiTestEnum(WISTRING, pair3_kv3->value->_type, enumToString);
+	wiTestString("value3", pair3_kv3->value->contents.stringVal);
 
 	freeEverything(testObject3);
 }
@@ -69,40 +82,40 @@ void testObject4() {
 	wiValue* testObject4 = parseJSONString(
 			"{ \"key1\": [1, 2, 3], \"key2\": false, \"key3\": \"value4\" }"
 	);
-	assert(testObject4->_type == WIPAIR);
+	wiTestEnum(WIPAIR, testObject4->_type, enumToString);
 	assert(testObject4->contents.pairVal != NULL);
 
 	wiPair* pair4_kv1 = testObject4->contents.pairVal;
-	assert(strcmp(pair4_kv1->key, "key1") == 0);
-	assert(pair4_kv1->value->_type == WIARRAY);
+	wiTestString("key1", pair4_kv1->key);
+	wiTestEnum(WIARRAY, pair4_kv1->value->_type, enumToString);
 	assert(pair4_kv1->value->contents.arrayVal != NULL);
 
 	// Verify array contents [1, 2, 3]
 	wiArrayEl* array1 = pair4_kv1->value->contents.arrayVal;
-	assert(array1->elementVal->_type == WIINT);
-	assert(array1->elementVal->contents.intVal == 1);
+	wiTestEnum(WIINT, array1->elementVal->_type, enumToString);
+	wiTestInt(1, array1->elementVal->contents.intVal);
 	assert(array1->nextElement != NULL);
 
 	wiArrayEl* array2 = array1->nextElement;
-	assert(array2->elementVal->_type == WIINT);
-	assert(array2->elementVal->contents.intVal == 2);
+	wiTestEnum(WIINT, array2->elementVal->_type, enumToString);
+	wiTestInt(2, array2->elementVal->contents.intVal);
 	assert(array2->nextElement != NULL);
 
 	wiArrayEl* array3 = array2->nextElement;
-	assert(array3->elementVal->_type == WIINT);
-	assert(array3->elementVal->contents.intVal == 3);
+	wiTestEnum(WIINT, array3->elementVal->_type, enumToString);
+	wiTestInt(3, array3->elementVal->contents.intVal);
 
 	wiPair* pair4_kv2 = pair4_kv1->nextPair;
 	assert(pair4_kv2 != NULL);
-	assert(strcmp(pair4_kv2->key, "key2") == 0);
-	assert(pair4_kv2->value->_type == WIBOOL);
-	assert(pair4_kv2->value->contents.boolVal == false);
+	wiTestString("key2", pair4_kv2->key);
+	wiTestEnum(WIBOOL, pair4_kv2->value->_type, enumToString);
+	wiTestBool(false, pair4_kv2->value->contents.boolVal);
 
 	wiPair* pair4_kv3 = pair4_kv2->nextPair;
 	assert(pair4_kv3 != NULL);
-	assert(strcmp(pair4_kv3->key, "key3") == 0);
-	assert(pair4_kv3->value->_type == WISTRING);
-	assert(strcmp(pair4_kv3->value->contents.stringVal, "value4") == 0);
+	wiTestString("key3", pair4_kv3->key);
+	wiTestEnum(WISTRING, pair4_kv3->value->_type, enumToString);
+	wiTestString("value4", pair4_kv3->value->contents.stringVal);
 
 	freeEverything(testObject4);
 }
@@ -115,9 +128,7 @@ int main() {
 	testObject3();
 	testObject4();
 
-	char message[] = "Simple object tests [BRIGHT-GREEN]succeeded[/].\n\n";
-	wiEnrich(message);
-	printf("%s", message);
+	wiPrintResult("simple objects");
 
 	return 0;
 }

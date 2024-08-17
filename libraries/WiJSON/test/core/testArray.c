@@ -2,52 +2,65 @@
 #include <string.h>
 
 #include "../../include/wiJSON.h"
-#include "../../../WiEnrich/include/enrich.h"
+#include "../../../WiTesting/wiTest.h"
+
+const char* enumToString(wiType type) {
+	switch (type) {
+        case WIARRAY: return "WIARRAY";
+        case WIBOOL: return "WIBOOL";
+        case WIFLOAT: return "WIFLOAT";
+        case WIINT: return "WIINT";
+        case WINULL: return "WINULL";
+        case WIPAIR: return "WIPAIR";
+        case WISTRING: return "WISTRING";
+		default: return "WI_UNKNOWN";
+    }
+}
 
 void testSimpleArray() {
 	wiValue* testArray = parseJSONString(
 			"[ 1, -32.4, \"Hello, World!\", true, false, -32e4, null]"
 	);
 
-	assert(testArray->_type == WIARRAY);
+	wiTestEnum(WIARRAY, testArray->_type, enumToString);
 	assert(testArray->contents.arrayVal != NULL);
 	assert(testArray->contents.arrayVal->elementVal != NULL);
 
 	wiArrayEl* currentElement = testArray->contents.arrayVal;
 
 	assert(currentElement != NULL);
-	assert(currentElement->elementVal->_type == WIINT);
-	assert(currentElement->elementVal->contents.intVal == 1);
+	wiTestEnum(WIINT, currentElement->elementVal->_type, enumToString);
+	wiTestInt(1, currentElement->elementVal->contents.intVal);
 
 	currentElement = currentElement->nextElement;
 
 	assert(currentElement != NULL);
-	assert(currentElement->elementVal->_type == WIFLOAT);
-	assert(currentElement->elementVal->contents.floatVal == -32.4);
+	wiTestEnum(WIFLOAT, currentElement->elementVal->_type, enumToString);
+	wiTestFloat(-32.4, currentElement->elementVal->contents.floatVal);
 
 	currentElement = currentElement->nextElement;
 
 	assert(currentElement != NULL);
-	assert(currentElement->elementVal->_type == WISTRING);
-	assert(strcmp(currentElement->elementVal->contents.stringVal, "Hello, World!") == 0);
+	wiTestEnum(WISTRING, currentElement->elementVal->_type, enumToString);
+	wiTestString("Hello, World!", currentElement->elementVal->contents.stringVal);
 
 	currentElement = currentElement->nextElement;
 
 	assert(currentElement != NULL);
-	assert(currentElement->elementVal->_type == WIBOOL);
-	assert(currentElement->elementVal->contents.boolVal == true);
+	wiTestEnum(WIBOOL, currentElement->elementVal->_type, enumToString);
+	wiTestBool(true, currentElement->elementVal->contents.boolVal);
 
 	currentElement = currentElement->nextElement;
 
 	assert(currentElement != NULL);
-	assert(currentElement->elementVal->_type == WIBOOL);
-	assert(currentElement->elementVal->contents.boolVal == false);
+	wiTestEnum(WIBOOL, currentElement->elementVal->_type, enumToString);
+	wiTestBool(false, currentElement->elementVal->contents.boolVal);
 
 	currentElement = currentElement->nextElement;
 
 	assert(currentElement != NULL);
-	assert(currentElement->elementVal->_type == WIFLOAT);
-	assert(currentElement->elementVal->contents.floatVal == -32e4);
+	wiTestEnum(WIFLOAT, currentElement->elementVal->_type, enumToString);
+	wiTestFloat(-32e4, currentElement->elementVal->contents.floatVal);
 
 	currentElement = currentElement->nextElement;
 
@@ -62,9 +75,6 @@ int main() {
 
 	testSimpleArray();
 
-	char message[] = "Simple array tests [BRIGHT-GREEN]succeeded[/].\n\n";
-	wiEnrich(message);
-	printf("%s", message);
+	wiPrintResult("simple array");
 }
-
 

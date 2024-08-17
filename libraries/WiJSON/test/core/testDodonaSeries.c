@@ -2,7 +2,20 @@
 #include <string.h>
 
 #include "../../include/wiJSON.h"
-#include "../../../WiEnrich/include/enrich.h"
+#include "../../../WiTesting/wiTest.h"
+
+const char* enumToString(wiType type) {
+	switch (type) {
+        case WIARRAY: return "WIARRAY";
+        case WIBOOL: return "WIBOOL";
+        case WIFLOAT: return "WIFLOAT";
+        case WIINT: return "WIINT";
+        case WINULL: return "WINULL";
+        case WIPAIR: return "WIPAIR";
+        case WISTRING: return "WISTRING";
+		default: return "WI_UNKNOWN";
+    }
+}
 
 void testDodonaSeries() {
 	wiValue* testObjectSeries = parseJSONString(
@@ -23,102 +36,102 @@ void testDodonaSeries() {
 	);
 
 	assert(testObjectSeries != NULL);
-	assert(testObjectSeries->_type == WIPAIR);
+	wiTestEnum(WIPAIR, testObjectSeries->_type, enumToString);
 
 	wiPair* pair = testObjectSeries->contents.pairVal;
 	assert(pair != NULL);
 
 	// Test "id"
-	assert(strcmp(pair->key, "id") == 0);
-	assert(pair->value->_type == WIINT);
-	assert(pair->value->contents.intVal == 36018);
+	wiTestString("id", pair->key);
+	wiTestEnum(WIINT, pair->value->_type, enumToString);
+	wiTestInt(36018, pair->value->contents.intVal);
 
 	pair = pair->nextPair;
 	assert(pair != NULL);
 
 	// Test "name"
-	assert(strcmp(pair->key, "name") == 0);
-	assert(pair->value->_type == WISTRING);
-	assert(strcmp(pair->value->contents.stringVal, "week 12: tweede evaluatie (JavaScript)") == 0);
+	wiTestString("name", pair->key);
+	wiTestEnum(WISTRING, pair->value->_type, enumToString);
+	wiTestString("week 12: tweede evaluatie (JavaScript)", pair->value->contents.stringVal);
 
 	pair = pair->nextPair;
 	assert(pair != NULL);
 
 	// Test "description"
-	assert(strcmp(pair->key, "description") == 0);
-	assert(pair->value->_type == WISTRING);
-	assert(strcmp(pair->value->contents.stringVal, "test-description101") == 0);
+	wiTestString("description", pair->key);
+	wiTestEnum(WISTRING, pair->value->_type, enumToString);
+	wiTestString("test-description101", pair->value->contents.stringVal);
 
 	pair = pair->nextPair;
 	assert(pair != NULL);
 
 	// Test "visibility"
-	assert(strcmp(pair->key, "visibility") == 0);
-	assert(pair->value->_type == WISTRING);
-	assert(strcmp(pair->value->contents.stringVal, "open") == 0);
+	wiTestString("visibility", pair->key);
+	wiTestEnum(WISTRING, pair->value->_type, enumToString);
+	wiTestString("open", pair->value->contents.stringVal);
 
 	pair = pair->nextPair;
 	assert(pair != NULL);
 
 	// Test "visibility_start"
-	assert(strcmp(pair->key, "visibility_start") == 0);
+	wiTestString("visibility_start", pair->key);
 	assert(pair->value->_type == WINULL);
 
 	pair = pair->nextPair;
 	assert(pair != NULL);
 
 	// Test "order"
-	assert(strcmp(pair->key, "order") == 0);
-	assert(pair->value->_type == WIINT);
-	assert(pair->value->contents.intVal == 11);
+	wiTestString("order", pair->key);
+	wiTestEnum(WIINT, pair->value->_type, enumToString);
+	wiTestInt(11, pair->value->contents.intVal);
 
 	pair = pair->nextPair;
 	assert(pair != NULL);
 
 	// Test "created_at"
-	assert(strcmp(pair->key, "created_at") == 0);
-	assert(pair->value->_type == WISTRING);
-	assert(strcmp(pair->value->contents.stringVal, "2024-02-08T14:51:07.000+01:00") == 0);
+	wiTestString("created_at", pair->key);
+	wiTestEnum(WISTRING, pair->value->_type, enumToString);
+	wiTestString("2024-02-08T14:51:07.000+01:00", pair->value->contents.stringVal);
 
 	pair = pair->nextPair;
 	assert(pair != NULL);
 
 	// Test "updated_at"
-	assert(strcmp(pair->key, "updated_at") == 0);
-	assert(pair->value->_type == WISTRING);
-	assert(strcmp(pair->value->contents.stringVal, "2024-05-25T21:00:13.000+02:00") == 0);
+	wiTestString("updated_at", pair->key);
+	wiTestEnum(WISTRING, pair->value->_type, enumToString);
+	wiTestString("2024-05-25T21:00:13.000+02:00", pair->value->contents.stringVal);
 
 	pair = pair->nextPair;
 	assert(pair != NULL);
 
 	// Test "deadline"
-	assert(strcmp(pair->key, "deadline") == 0);
-	assert(pair->value->_type == WISTRING);
-	assert(strcmp(pair->value->contents.stringVal, "2024-05-14T17:10:00.000+02:00") == 0);
+	wiTestString("deadline", pair->key);
+	wiTestEnum(WISTRING, pair->value->_type, enumToString);
+	wiTestString("2024-05-14T17:10:00.000+02:00", pair->value->contents.stringVal);
 
 	pair = pair->nextPair;
 	assert(pair != NULL);
 
 	// Test "url"
-	assert(strcmp(pair->key, "url") == 0);
-	assert(pair->value->_type == WISTRING);
-	assert(strcmp(pair->value->contents.stringVal, "https://dodona.be/nl/series/36018.json") == 0);
+	wiTestString("url", pair->key);
+	wiTestEnum(WISTRING, pair->value->_type, enumToString);
+	wiTestString("https://dodona.be/nl/series/36018.json", pair->value->contents.stringVal);
 
 	pair = pair->nextPair;
 	assert(pair != NULL);
 
 	// Test "course"
-	assert(strcmp(pair->key, "course") == 0);
-	assert(pair->value->_type == WISTRING);
-	assert(strcmp(pair->value->contents.stringVal, "https://dodona.be/nl/courses/3355.json") == 0);
+	wiTestString("course", pair->key);
+	wiTestEnum(WISTRING, pair->value->_type, enumToString);
+	wiTestString("https://dodona.be/nl/courses/3355.json", pair->value->contents.stringVal);
 
 	pair = pair->nextPair;
 	assert(pair != NULL);
 
 	// Test "exercises"
-	assert(strcmp(pair->key, "exercises") == 0);
-	assert(pair->value->_type == WISTRING);
-	assert(strcmp(pair->value->contents.stringVal, "https://dodona.be/nl/series/36018/activities.json") == 0);
+	wiTestString("exercises", pair->key);
+	wiTestEnum(WISTRING, pair->value->_type, enumToString);
+	wiTestString("https://dodona.be/nl/series/36018/activities.json", pair->value->contents.stringVal);
 
 	pair = pair->nextPair;
 	assert(pair == NULL);  // No more pairs, ensure we have checked all expected values
@@ -133,9 +146,7 @@ int main() {
 
 	testDodonaSeries();
 
-	char message[] = "Dodona series test [BRIGHT-GREEN]passed[/].\n\n";
-	wiEnrich(message);
-	printf("%s", message);
+	wiPrintResult("Dodona series");
 
 	return 0;
 }

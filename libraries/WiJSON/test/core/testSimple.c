@@ -1,5 +1,4 @@
 #include "../../include/wiJSON.h"
-#include "../../../WiEnrich/include/enrich.h"
 #include "../../../WiTesting/wiTest.h"
 
 const char* enumToString(wiType type) {
@@ -81,19 +80,7 @@ int main() {
 	testString();
 	testFloat();
 
-	if (wiFailedTests > 1) {
-		char message[] = "simple value-tests [BRIGHT-RED]failed[/].";
-		wiEnrich(message);
-		printf("%d %s\n\n", wiFailedTests, message);
-	} else if (wiFailedTests == 1) {
-		char message[] = "simple value-test [BRIGHT-RED]failed[/].";
-		wiEnrich(message);
-		printf("%d %s\n\n", wiFailedTests, message);
-	} else {
-		char message[] = "Simple tests [BRIGHT-GREEN]succeeded[/].";
-		wiEnrich(message);
-		printf("%s\n\n", message);
-	}
+	wiPrintResult("simple values");
 
 	return 0;
 }
