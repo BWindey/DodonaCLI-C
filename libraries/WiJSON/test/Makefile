@@ -21,6 +21,9 @@ UTILITY_EXECUTABLES = $(patsubst $(UTILITY_DIR)/%.c,$(OUT_UTILITY_DIR)/%.out,$(U
 # Default target
 all: core utility
 
+
+cleantest: clean all
+
 # Only test core-tests
 core: $(CORE_EXECUTABLES)
 	@echo ""
@@ -59,4 +62,4 @@ clean:
 	rm -rf $(OUT_CORE_DIR) $(OUT_UTILITY_DIR)
 
 
-.PHONY: all clean
+.PHONY: all clean core utility cleantest
