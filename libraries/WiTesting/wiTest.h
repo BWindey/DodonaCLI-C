@@ -62,3 +62,10 @@ static int wiFailedTests = 0;
 		_wiTest(#EXPECTED, #GOT, "\"%s\"", GOT); \
 	} \
 }
+
+#define wiTestChar(EXPECTED, GOT) \
+{ \
+	if ((EXPECTED) != (GOT)) { \
+		_wiTest(#EXPECTED, #GOT, "'%c'", (char)GOT); \
+	} \
+}
