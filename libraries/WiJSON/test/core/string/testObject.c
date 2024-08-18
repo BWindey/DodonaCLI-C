@@ -1,8 +1,7 @@
 #include <assert.h>
-#include <string.h>
 
-#include "../../include/wiJSON.h"
-#include "../../../WiTesting/wiTest.h"
+#include "../../../include/wiJSON.h"
+#include "../../../../WiTesting/wiTest.h"
 
 const char* enumToString(wiType type) {
 	switch (type) {

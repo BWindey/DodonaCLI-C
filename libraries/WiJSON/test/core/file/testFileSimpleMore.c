@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../../include/wiJSON.h"
-#include "../../../WiEnrich/include/enrich.h"
+#include "../../../include/wiJSON.h"
+#include "../../../../WiEnrich/include/enrich.h"
 
 void testSimple() {
 	FILE* jsonFile = fopen(
-		"/home/bram/Programming/CProjects/DodonaCLI/libraries/WiJSON/test/core/files/testSimpleMore.json", 
+		"/home/bram/Programming/CProjects/DodonaCLI/libraries/WiJSON/test/core/file/files/testSimpleMore.json", 
 		"r"
 	);
 

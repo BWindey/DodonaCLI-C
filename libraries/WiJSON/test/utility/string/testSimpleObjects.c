@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../../include/wiJSON.h"
-#include "../../include/wiUtility.h"
-#include "../../../WiEnrich/include/enrich.h"
+#include "../../../include/wiJSON.h"
+#include "../../../include/wiUtility.h"
+#include "../../../../WiEnrich/include/enrich.h"
 
 void testObject1() {
 	// Test 1: Simple object with one key-value pair (string)
