@@ -148,16 +148,63 @@ void parseString(FILE* jsonFile, wiValue* parent) {
 	assert(stringVal != NULL);
 
 	unsigned int index = 0;
+	bool escaped = false;
 
 	// "Cursor" still stands on the opening quote
 	c = fgetc(jsonFile);
 	stringVal[index] = c;
 	index++;
 
-	while (c != EOF && c != '"') {
+	while (c != EOF && (c != '"' || escaped)) {
 		c = fgetc(jsonFile);
-		stringVal[index] = c;
-		index++;
+
+		// TODO: move to own function for readability
+		if (escaped) {
+			switch (c) {
+				case '"':
+				case '\\':
+				case '/':
+					stringVal[index] = c;
+					index++;
+					break;
+
+				case 'b':
+					stringVal[index] = '\b';
+					index++;
+					break;
+
+				case 'f':
+					stringVal[index] = '\f';
+					index++;
+					break;
+
+				case 'n':
+					stringVal[index] = '\n';
+					index++;
+					break;
+
+				case 'r':
+					stringVal[index] = '\r';
+					index++;
+					break;
+
+				case 't':
+					stringVal[index] = '\t';
+					index++;
+					break;
+
+				case 'u':
+					// TODO: parse hex-escape code
+					break;
+			}
+			escaped = false;
+
+		} else if (c == '\\') {
+			escaped = true;
+		} else {
+			stringVal[index] = c;
+			index++;
+		}
 
 		// Re-allocate to larger string if needed
 		if (index >= buffersize - 1) {
