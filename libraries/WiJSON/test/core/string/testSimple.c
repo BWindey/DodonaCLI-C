@@ -75,6 +75,7 @@ void testFloat() {
 int main() {
 	printf("Testing simple values...\n");
 
+
 	testInt();
 	testBool();
 	testString();

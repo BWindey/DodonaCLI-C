@@ -166,6 +166,8 @@ void parseString(FILE* jsonFile, wiValue* parent) {
 				case '/':
 					stringVal[index] = c;
 					index++;
+					// Change to continue loop
+					c = 0;
 					break;
 
 				case 'b':
@@ -194,8 +196,16 @@ void parseString(FILE* jsonFile, wiValue* parent) {
 					break;
 
 				case 'u':
-					// TODO: parse hex-escape code
-					break;
+					{
+						char buffer[5];
+						for (int i = 0; i < 4; i++) {
+							c = fgetc(jsonFile);
+							assert(isxdigit(c));
+							buffer[i] = c;
+						}
+						buffer[4] = '\0';
+						break;
+					}
 			}
 			escaped = false;
 
