@@ -197,6 +197,8 @@ void parseString(FILE* jsonFile, wiValue* parent) {
 
 				case 'u':
 					{
+						bool notYetSupported = false;
+						assert(notYetSupported);
 						char buffer[5];
 						for (int i = 0; i < 4; i++) {
 							c = fgetc(jsonFile);
