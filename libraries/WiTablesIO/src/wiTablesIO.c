@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../include/wiTUI.h"
+#include "../include/wiTablesIO.h"
 
 void setDefaultShortcuts(wiShortcuts* shortcuts) {
 	assert(shortcuts != NULL);
