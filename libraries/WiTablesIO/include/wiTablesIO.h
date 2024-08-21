@@ -2,6 +2,7 @@
 
 typedef struct wiBox {
 	char* title;
+	char* content;
 	int width;
 } wiBox;
 
@@ -22,6 +23,8 @@ typedef struct wiTable {
 	char* title;
 	wiRow** rows;
 	wiShortcuts* shortcuts;
+	int _rows;
+	int _collums;
 } wiTable;
 
 
