@@ -35,7 +35,7 @@ Each function expects 2 arguments: EXPECTED and GOT.
 
 The functions will evaulate whether EXPECTED == GOT, 
 and print out a message to stderr when this evaluation fails:
-[!example_output.png](./example_output.png)
+![example_output.png](./example_output.png)
 
 > [!IMPORTANT]
 > These testing-functions will never abort the program.
