@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,9 +21,9 @@ struct patternStruct {
 
 void wiEnrich(char* msg) {
     char* noColorTemp = getenv("NO_COLOR");
-    char noColor = (noColorTemp == NULL || strlen(noColorTemp) == 0) ? 'F' : 'T';
+    bool noColor = (noColorTemp == NULL || strlen(noColorTemp) == 0) ? false : true;
 
-    char currentlyOpen = 'F';
+    bool currentlyOpen = false;
     unsigned int msgLength = strlen(msg);
 
     // pOri will be used for the iteration,
@@ -101,7 +102,10 @@ void wiEnrich(char* msg) {
 
                 // Check if valid, and which, keyword
                 keyword = 0;
-                while (strcmp(substring, patterns[keyword].pattern) != 0 && keyword < SUPPORTED_KEYWORDS) {
+                while (
+						strcmp(substring, patterns[keyword].pattern) != 0 
+						&& keyword < SUPPORTED_KEYWORDS
+					) {
                     keyword++;
                 }
                 // Enforce valid keyword
@@ -109,15 +113,19 @@ void wiEnrich(char* msg) {
 
                 // Don't allow closing nothing (due to in-place nature of this operation)
                 if (keyword == 0) {
-                    assert(currentlyOpen == 'T');
-                    currentlyOpen = 'F';
+                    assert(currentlyOpen == true);
+                    currentlyOpen = false;
                 } else {
-                    currentlyOpen = 'T';
+                    currentlyOpen = true;
                 }
 
                 // Actually replace
-                if (noColor == 'F') {
-                    strncpy(msg + pNew, patterns[keyword].replacement, patterns[keyword].replacementLength);
+                if (noColor == false) {
+                    strncpy(
+						msg + pNew, 
+						patterns[keyword].replacement, 
+						patterns[keyword].replacementLength
+					);
                     pOri += patterns[keyword].patternLength - 1;
                     pNew += patterns[keyword].replacementLength - 1;
                 } else {
@@ -129,7 +137,6 @@ void wiEnrich(char* msg) {
             msg[pNew] = msg[pOri];
         }
 
-
         pNew++;
         pOri++;
     }
@@ -139,5 +146,5 @@ void wiEnrich(char* msg) {
     }
 
     // Enforce closed
-    assert(currentlyOpen == 'F');
+    assert(currentlyOpen == false);
 }
