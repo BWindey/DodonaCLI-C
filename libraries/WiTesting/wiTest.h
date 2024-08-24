@@ -9,13 +9,21 @@
 
 static int wiFailedTests = 0;
 
-#define _wiTest(EXPECTED_STR, GOT_STR, GOT_VALUE_FORMAT, GOT_VALUE) \
+#define _wiTest(EXPECTED_STR, GOT_STR, GOT_VALUE_FORMAT, GOT_VALUE, ...) \
 { \
 	wiFailedTests += 1; \
     char* oldLocale = strdup(setlocale(LC_ALL, NULL)); \
     setlocale(LC_ALL, ""); \
-    fprintf(stderr, "\033[91;1mAssertion\033[0m: '%s == %s'\n", EXPECTED_STR, GOT_STR); \
-    fprintf(stderr, "\u2502 Actual:   " GOT_VALUE_FORMAT "\n", GOT_VALUE); \
+    fprintf(stderr, "\033[91;1mFailed test\033[0m: '%s == %s'\n", EXPECTED_STR, GOT_STR); \
+    fprintf(stderr, "\u2502 Actual:     " GOT_VALUE_FORMAT "\n", GOT_VALUE); \
+	\
+	char* varArgs[] = { __VA_ARGS__ "", "" }, **n; \
+	n = varArgs; \
+	while (strcmp(*n, "") != 0) { \
+		fprintf(stderr, "\u2502 Message: \"%s\"\n", *n); \
+		n++; \
+	} \
+	\
     fprintf(stderr, \
             "\u2570 At function '%s', file '%s', line %d\n\n", \
             __func__, __FILE__, __LINE__ \
@@ -25,49 +33,52 @@ static int wiFailedTests = 0;
 }
 
 
-#define wiTestInt(EXPECTED, GOT) \
+#define wiTestInt(EXPECTED, GOT, ...) \
 { \
 	if ((EXPECTED) != (GOT)) { \
-		_wiTest(#EXPECTED, #GOT, "%ld", (long)(GOT)); \
+		_wiTest(#EXPECTED, #GOT, "%ld", (long)(GOT), __VA_ARGS__); \
 	} \
 }
  
-#define FLOAT_TOLERANCE 0.0001
-#define wiTestFloat(EXPECTED, GOT) \
+#ifndef FLOAT_TOLERANCE
+#define FLOAT_TOLERANCE 1e-5
+#endif // !FLOAT_TOLERANCE
+
+#define wiTestFloat(EXPECTED, GOT, ...) \
 { \
 	if (fabs((EXPECTED) - (GOT)) > FLOAT_TOLERANCE) { \
-		_wiTest(#EXPECTED, #GOT, "%f", (double)GOT); \
+		_wiTest(#EXPECTED, #GOT, "%f", (double)(GOT), __VA_ARGS__); \
 	} \
 }
 
 
-#define wiTestBool(EXPECTED, GOT) \
+#define wiTestBool(EXPECTED, GOT, ...) \
 { \
 	if ((EXPECTED) != (GOT)) { \
 		const char* expectedStr = (EXPECTED) ? "true" : "false"; \
 		const char* gotStr = (GOT) ? "true" : "false"; \
-		_wiTest(expectedStr, #GOT, "%s", gotStr); \
+		_wiTest(expectedStr, #GOT, "%s", gotStr, __VA_ARGS__); \
 	} \
 }
  
-#define wiTestEnum(EXPECTED, GOT, enumToString) \
+#define wiTestEnum(EXPECTED, GOT, enumToString, ...) \
 { \
 	if ((EXPECTED) != (GOT)) {\
-		_wiTest(enumToString(EXPECTED), #GOT, "%s", enumToString(GOT)); \
+		_wiTest(enumToString(EXPECTED), #GOT, "%s", enumToString(GOT), __VA_ARGS__); \
 	} \
 }
 
-#define wiTestString(EXPECTED, GOT) \
+#define wiTestString(EXPECTED, GOT, ...) \
 { \
 	if (strcmp((EXPECTED), (GOT)) != 0) { \
-		_wiTest(#EXPECTED, #GOT, "\"%s\"", GOT); \
+		_wiTest(#EXPECTED, #GOT, "\"%s\"", (GOT), __VA_ARGS__); \
 	} \
 }
 
-#define wiTestChar(EXPECTED, GOT) \
+#define wiTestChar(EXPECTED, GOT, ...) \
 { \
 	if ((EXPECTED) != (GOT)) { \
-		_wiTest(#EXPECTED, #GOT, "'%c'", (char)GOT); \
+		_wiTest(#EXPECTED, #GOT, "'%c'", (char)(GOT), __VA_ARGS__); \
 	} \
 }
 
