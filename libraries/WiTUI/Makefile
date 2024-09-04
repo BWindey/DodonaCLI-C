@@ -9,9 +9,9 @@ OBJDIR = obj
 LIBDIR = lib
 
 # Files
-SRC = $(SRCDIR)/wiTablesIO.c
-OBJ = $(OBJDIR)/wiTablesIO.o
-LIB = $(LIBDIR)/libwitablesio.a
+SRC = $(SRCDIR)/wiTUI.c
+OBJ = $(OBJDIR)/wiTUI.o
+LIB = $(LIBDIR)/libwitui.a
 
 # Default target to build the library
 all: $(LIB)
