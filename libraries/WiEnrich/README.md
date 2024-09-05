@@ -4,7 +4,7 @@ This is a C-library that allows you to write text like:
 "This is [GREEN]text [ON BRIGHT-BLUE]on a bright-blue[/] background."
 ```
 
-The single function `void enrich(char* message)` will take the string,
+The single function `char* enrich(char* message)` will take the string,
 and substitute all the keywords in proper escape-characters.
 
 This substitution will happen in-place, 
@@ -15,9 +15,12 @@ and it will happen in a single pass through the string.
 > Potential problems:
 >   - Invalid keyword between `[]`
 >   - Closing (`[/]`) without having started an effect
->   - Not closing (`[/]`) at the end of the message
 >
 > To avoid that your program will crash, test it first ;-)
+
+> [!CAUTION]
+> Passing a string literal to the function will cause a seg-fault!
+> This is due to the nature of string literals, they can't be modified.
 
 
 ## How to use

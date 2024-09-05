@@ -19,7 +19,7 @@ struct patternStruct {
 };
 
 
-void wiEnrich(char* msg) {
+char* wiEnrich(char* msg) {
     char* noColorTemp = getenv("NO_COLOR");
     bool noColor = (noColorTemp == NULL || strlen(noColorTemp) == 0) ? false : true;
 
@@ -44,10 +44,13 @@ void wiEnrich(char* msg) {
         {"BRIGHT-BLACK",    "\033[90m",   14, 5},
         {"ON BLACK",        "\033[40m",   10, 5},
         {"ON BRIGHT-BLACK", "\033[100m",  17, 6},
+
         {"RED",             "\033[31m",   5,  5},
         {"BRIGHT-RED",      "\033[91m",   12, 5},
+
         {"ON RED",          "\033[41m",   8,  5},
         {"ON BRIGHT-RED",   "\033[101m",  15, 6},
+
         {"GREEN",           "\033[32m",   7,  5},
         {"BRIGHT-GREEN",    "\033[92m",   14, 5},
         {"ON GREEN",        "\033[42m",   10, 5},
@@ -141,10 +144,7 @@ void wiEnrich(char* msg) {
         pOri++;
     }
 
-    if (pOri > pNew) {
-        msg[pNew] = '\0';
-    }
+	msg[pNew] = '\0';
 
-    // Enforce closed
-    assert(currentlyOpen == false);
+	return msg;
 }
