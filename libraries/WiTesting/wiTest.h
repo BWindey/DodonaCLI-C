@@ -19,8 +19,11 @@ static int wiFailedTests = 0;
 	\
 	char* varArgs[] = { __VA_ARGS__ "", "" }, **n; \
 	n = varArgs; \
+	if (strcmp(*n, "") != 0) { \
+		fprintf(stderr, "\u2502 Message:\n"); \
+	} \
 	while (strcmp(*n, "") != 0) { \
-		fprintf(stderr, "\u2502 Message: \"%s\"\n", *n); \
+		fprintf(stderr, "\u2502 \t%s\n", *n); \
 		n++; \
 	} \
 	\
