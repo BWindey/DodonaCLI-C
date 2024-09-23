@@ -38,8 +38,10 @@ static int wiFailedTests = 0;
 
 #define wiTestInt(EXPECTED, GOT, ...) \
 { \
-	if ((EXPECTED) != (GOT)) { \
-		_wiTest(#EXPECTED, #GOT, "%ld", (long)(GOT), __VA_ARGS__); \
+	long exp = (long)(EXPECTED); \
+	long got = (long)(GOT); \
+	if (exp != got) { \
+		_wiTest(#EXPECTED, #GOT, "%ld", got, __VA_ARGS__); \
 	} \
 }
  
@@ -49,17 +51,21 @@ static int wiFailedTests = 0;
 
 #define wiTestFloat(EXPECTED, GOT, ...) \
 { \
-	if (fabs((EXPECTED) - (GOT)) > FLOAT_TOLERANCE) { \
-		_wiTest(#EXPECTED, #GOT, "%f", (double)(GOT), __VA_ARGS__); \
+	double expected = (double)(EXPECTED); \
+	double got = (double)(GOT); \
+	if (fabs(expected - got) > FLOAT_TOLERANCE) { \
+		_wiTest(#EXPECTED, #GOT, "%f", got, __VA_ARGS__); \
 	} \
 }
 
 
 #define wiTestBool(EXPECTED, GOT, ...) \
 { \
-	if ((EXPECTED) != (GOT)) { \
-		const char* expectedStr = (EXPECTED) ? "true" : "false"; \
-		const char* gotStr = (GOT) ? "true" : "false"; \
+	bool expected = (bool)(EXPECTED); \
+	bool got = (bool)(GOT); \
+	if (expected != got) { \
+		const char* expectedStr = expected ? "true" : "false"; \
+		const char* gotStr = got ? "true" : "false"; \
 		_wiTest(expectedStr, #GOT, "%s", gotStr, __VA_ARGS__); \
 	} \
 }
@@ -80,8 +86,10 @@ static int wiFailedTests = 0;
 
 #define wiTestChar(EXPECTED, GOT, ...) \
 { \
-	if ((EXPECTED) != (GOT)) { \
-		_wiTest(#EXPECTED, #GOT, "'%c'", (char)(GOT), __VA_ARGS__); \
+	char expected = (char)(EXPECTED); \
+	char got = (char)(GOT); \
+	if (expected != got) { \
+		_wiTest(#EXPECTED, #GOT, "'%c'", got, __VA_ARGS__); \
 	} \
 }
 
