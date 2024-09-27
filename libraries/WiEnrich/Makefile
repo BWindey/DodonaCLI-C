@@ -1,6 +1,6 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -Iinclude -Wall -Wextra -pedantic
+CFLAGS = -Iinclude -Wall -Wextra -pedantic -O3
 
 # Directories
 SRCDIR = src
@@ -9,8 +9,8 @@ OBJDIR = obj
 LIBDIR = lib
 
 # Files
-SRC = $(SRCDIR)/enrich.c
-OBJ = $(OBJDIR)/enrich.o
+SRC = $(SRCDIR)/wiEnrich.c
+OBJ = $(OBJDIR)/wiEnrich.o
 LIB = $(LIBDIR)/libwienrich.a
 
 # Default target to build the library
@@ -21,7 +21,7 @@ $(LIB): $(OBJ) | $(LIBDIR)
 	ar rcs $@ $^
 
 # Rule to compile object file
-$(OBJ): $(SRC) | $(OBJDIR)
+$(OBJ): $(SRC) $(INCDIR) | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Ensure lib directory exists

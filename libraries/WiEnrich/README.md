@@ -1,4 +1,7 @@
 # wiEnrich library
+> [!WARNING]
+> For technical reasons, [RED] is not a valid keyword, use [FRED]!
+
 This is a C-library that allows you to write text like:
 ```
 "This is [GREEN]text [ON BRIGHT-BLUE]on a bright-blue[/] background."
@@ -13,20 +16,34 @@ and it will happen in a single pass through the string.
 > [!WARNING]
 > This library WILL throw a runtime error when it detected a problem.
 > Potential problems:
+>   - No closing `]` for a non-escaped opening `[`
 >   - Invalid keyword between `[]`
->   - Closing (`[/]`) without having started an effect
+>   - Using `[/]` without having used another pattern first
 >
 > To avoid that your program will crash, test it first ;-)
 
 > [!CAUTION]
 > Passing a string literal to the function will cause a seg-fault!
 > This is due to the nature of string literals, they can't be modified.
+> Use strdup("...") to circumvent this.
+
+
+## NO\_COLOR
+When the "$NO\_COLOR" system variable is set, 
+no colour will be substituted. Only bold, italic, 
 
 
 ## How to use
-Run `make` inside the 'Enrich/' directory. 
-This will produce `lib/libenrich.a`, which you can link to your own program.
-Don't forget to also `#include "enrich.h"` in some way. 
+Run `make` inside the 'WiEnrich/' directory. 
+This will produce `lib/libwienrich.a`, which you can link to your own program,
+as a normal object file.
+
+Alternatively, place `wiEnrich.c` alongside your other '.c' files.
+
+This library uses another library of mine: `wiAssert.h`. 
+You will need to include it when you don't use the first method to get your 
+library file.
+Don't forget to also `#include "wiEnrich.h"` in some way. 
 
 
 ## Limitations
@@ -59,7 +76,7 @@ and both are also available in their bright versions.
 - "[ON BLACK]"        
 - "[ON BRIGHT-BLACK]" 
 
-- "[RED]"             
+- "[FRED]"          <- WATCH OUT, has weird name
 - "[BRIGHT-RED]"      
 - "[ON RED]"          
 - "[ON BRIGHT-RED]"   
