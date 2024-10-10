@@ -1,6 +1,6 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -I../include -I../../WiEnrich -Wall -Wextra -pedantic
+CFLAGS = -I../include -I../../WiEnrich -Wall -Wextra -pedantic -g
 LDFLAGS = -L../lib -lwiJSON -L../../WiEnrich/lib -lwienrich
 
 TESTING_LIB = ../../WiTesting/wiTest.h
