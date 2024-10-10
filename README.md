@@ -10,7 +10,7 @@ Currently working on a json-library =)
 
 
 ## Requires:
-gcc and Make to compile, and the C99 standard (for `strtol` and `strtod`). 
+gcc and Make to compile, and the C99 standard (for `strtol`, `strtod` and \_\_func\_\_). 
 No idea if this works on Windows/MacOS, haven't tested
 
 ## To Do:
