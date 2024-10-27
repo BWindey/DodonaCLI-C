@@ -8,10 +8,20 @@
 wi_window* wi_make_window(void) {
 	wi_window* window = (wi_window*) malloc(sizeof(wi_window));
 
-	window->width = 10;
+	wi_size size = {
+		.is_flex_height = false,
+		.is_flex_width = false,
+		.is_perc_height = false,
+		.is_perc_width = false,
+
+		.width.fixed_width = 10,
+		.height.fixed_height = 10,
+	};
+	window->size = size;
+
 	window->_internal_rendered_width = 10;
 	window->_internal_rendered_height = 10;
-	window->height = 10;
+
 	window->title = "Test window";
 	window->footer = "q: quit";
 	window->title_alignment = LEFT;

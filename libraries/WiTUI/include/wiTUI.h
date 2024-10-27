@@ -45,11 +45,41 @@ typedef enum wi_info_alignment {
 	LEFT, CENTER, RIGHT
 } wi_info_alignment;
 
+/*
+ * 4 bools indicating which value to take from the union,
+ * and how to interpret it.
+ *
+ * Percentage-sizes are relative to the terminal size,
+ * and have to be in the [0, 100] range.
+ *
+ * Flex-weights are used to the available space is shared with other flex windows.
+ */
+typedef struct wi_size {
+	bool is_flex_height;
+	bool is_flex_width;
+	bool is_perc_height;
+	bool is_perc_width;
+
+	union wi_width {
+		int fixed_width;
+		int percentage_width;
+		int flex_width_weight;
+	};
+	union wi_height {
+		int fixed_height;
+		int percentage_height;
+		int flex_height_weight;
+	};
+
+	union wi_height height;
+	union wi_width width;
+} wi_size;
+
 typedef struct wi_session wi_session;
 typedef struct wi_window wi_window;
 typedef struct wi_window {
-	int width;
-	int height;
+	wi_size size;
+
 	char* title;
 	char* footer;
 	wi_info_alignment title_alignment;
