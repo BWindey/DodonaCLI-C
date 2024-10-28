@@ -79,6 +79,7 @@ typedef struct wi_session wi_session;
 typedef struct wi_window wi_window;
 typedef struct wi_window {
 	wi_size size;
+	int priority;
 
 	char* title;
 	char* footer;
@@ -119,11 +120,20 @@ typedef struct wi_session {
 	bool full_screen;
 	wi_position cursor_start;
 	wi_movement_keys movement_keys;
+	int max_height;
+
+	char* title;
+	char* footer;
+	wi_info_alignment title_alignment;
+	wi_info_alignment footer_alignment;
+	wi_border border;
 
 	/* Only change this outside library code if you like debugging. */
 	int _internal_amount_rows;
 	/* Only change this outside library code if you like debugging (HEAP). */
 	int* _internal_amount_cols;
+	/* Only change this outside library code if you like debugging (HEAP). */
+	wi_position** _internal_window_positions;
 } wi_session;
 
 typedef struct wi_result {

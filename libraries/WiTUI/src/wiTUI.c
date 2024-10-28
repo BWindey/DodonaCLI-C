@@ -18,6 +18,7 @@ wi_window* wi_make_window(void) {
 		.height.fixed_height = 10,
 	};
 	window->size = size;
+	window->priority = 0;
 
 	window->_internal_rendered_width = 10;
 	window->_internal_rendered_height = 10;
@@ -62,6 +63,7 @@ wi_session* wi_make_session() {
 	int rows = 1;
 	session->windows = (wi_window***) malloc(rows * sizeof(wi_window**));
 	session->windows[0] = NULL;
+	session->_internal_window_positions = NULL;
 	session->_internal_amount_rows = rows;
 	session->_internal_amount_cols = (int*) malloc(rows * sizeof(int));
 	session->_internal_amount_cols[0] = 0;
@@ -77,6 +79,12 @@ wi_session* wi_make_session() {
 	mKeys.quit = 'q';
 	mKeys.modifier_key = CTRL;
 	session->movement_keys = mKeys;
+
+	session->title = NULL;
+	session->footer = NULL;
+	session->title_alignment = 0;
+	session->footer_alignment = 0;
+	session->border = (wi_border){ 0 };
 
 	return session;
 }
