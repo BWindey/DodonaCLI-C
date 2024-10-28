@@ -63,7 +63,7 @@ wi_session* wi_make_session() {
 	int rows = 1;
 	session->windows = (wi_window***) malloc(rows * sizeof(wi_window**));
 	session->windows[0] = NULL;
-	session->_internal_window_positions = NULL;
+	session->_internal_window_positions = (wi_position**) malloc(rows * sizeof(wi_position*));
 	session->_internal_amount_rows = rows;
 	session->_internal_amount_cols = (int*) malloc(rows * sizeof(int));
 	session->_internal_amount_cols[0] = 0;
@@ -95,22 +95,41 @@ wi_session* wi_add_window_to_session(wi_session* session, wi_window* window, int
 		row = session->_internal_amount_rows;
 		session->_internal_amount_rows++;
 
-		session->windows = realloc(session->windows, (row + 1) * sizeof(wi_window**));
+		session->windows = realloc(
+			session->windows, (row + 1) * sizeof(wi_window**)
+		);
 		wiAssert(session->windows != NULL, "Something went wrong while trying to add a window to a session");
 		session->windows[row] = NULL;
 
-		session->_internal_amount_cols = realloc(session->_internal_amount_cols, (row + 1) * sizeof(int));
+		session->_internal_amount_cols = realloc(
+			session->_internal_amount_cols, (row + 1) * sizeof(int)
+		);
 		wiAssert(session->_internal_amount_cols != NULL, "Something went wrong while tring to add a window to a session");
 		session->_internal_amount_cols[row] = 0;
+
+		session->_internal_window_positions = realloc(
+			session->_internal_window_positions, (row + 1) * sizeof(int)
+		);
+		wiAssert(session->_internal_window_positions != NULL, "Something went wrong while tring to add a window to a session");
+		session->_internal_window_positions[row] = NULL;
 	}
 
 	/* Grow the row */
 	int col = session->_internal_amount_cols[row];
 	session->_internal_amount_cols[row]++;
-	session->windows[row] = realloc(session->windows[row], session->_internal_amount_cols[row] * sizeof(wi_window*));
+
+	session->windows[row] = realloc(
+		session->windows[row],
+		session->_internal_amount_cols[row] * sizeof(wi_window*)
+	);
 	wiAssert(session->windows[row] != NULL, "Something went wrong while tring to add a window to a session");
 
 	session->windows[row][col] = window;
+
+	session->_internal_window_positions[row] = realloc(
+		session->_internal_window_positions[row],
+		session->_internal_amount_cols[row] * sizeof(wi_window*)
+	);
 
 	return session;
 }
