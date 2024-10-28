@@ -112,55 +112,18 @@ terminal_size get_terminal_size() {
  * @returns: updated session
  */
 wi_session* calculate_window_dimension(wi_session* session) {
-	const int available_width = get_terminal_size().cols;
+	const terminal_size terminal_size = get_terminal_size();
+
 	wi_window* window;
 
+	int min_row_height = terminal_size.rows;
+	/* TODO: keep track of min sizes and assign the window positions */
+
+	/* Calculate all the window positions */
 	for (int row = 0; row < session->_internal_amount_rows; row++) {
-		wi_window* windows_to_compute[session->_internal_amount_cols[row]];
-		int amount_to_compute = 0;
-		int occupied_width = 0;
-
-
-		/* Find windows with width -1,
-		 * the others already can have their rendered width */
 		for (int col = 0; col < session->_internal_amount_cols[row]; col++) {
-			window = session->windows[row][col];
-			if (window->width == -1) {
-				windows_to_compute[amount_to_compute] = window;
-				amount_to_compute++;
-			} else {
-				/* +2 because border */
-				window->_internal_rendered_width = window->width;
-				occupied_width += session->windows[row][col]->width;
-
-				if (window->border.corner_bottom_left != NULL) {
-					occupied_width += 2;
-				}
-			}
-		}
-
-		if (amount_to_compute == 0) {
-			continue;
-		}
-
-		/* Calculate how wide each window can be */
-		const int width_to_distribute = available_width - occupied_width;
-		const int distributed_width = width_to_distribute / amount_to_compute;
-		const int left_over =
-			width_to_distribute - (distributed_width * amount_to_compute);
-
-		for (int col = 0; col < amount_to_compute; col++) {
-			/* -2 because border */
-			wi_window* window = windows_to_compute[col];
-			window->_internal_rendered_width = distributed_width;
-			if (window->border.corner_bottom_left != NULL) {
-				window->_internal_rendered_width -= 2;
-			}
-
-			/* Distribute left-over among the first windows, to fill screen */
-			if (col < left_over) {
-				windows_to_compute[col]->_internal_rendered_width++;
-			}
+			session->_internal_window_positions[row][col] =
+				(wi_position) { 0, 0 };
 		}
 	}
 
