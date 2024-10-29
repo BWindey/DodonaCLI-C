@@ -115,16 +115,41 @@ wi_session* calculate_window_dimension(wi_session* session) {
 	const terminal_size terminal_size = get_terminal_size();
 
 	wi_window* window;
+	int window_width;
 
 	int min_row_height = terminal_size.rows;
 	/* TODO: keep track of min sizes and assign the window positions */
 
-	/* Calculate all the window positions */
+	/* Step 1: check how wide each window will be */
+	/* Step 2: assign max height to the windows */
+	/* Step 3: calculate the positions for each window (don't factor overlap) */
+	/* Step 4: detect overlap and resolve */
+
+	/* Step 1 and 2 */
 	for (int row = 0; row < session->_internal_amount_rows; row++) {
+		wi_window* flex_windows[session->_internal_amount_cols[row]];
+		int amount_to_compute = 0;
+		int static_occupied_width = 0;
+
 		for (int col = 0; col < session->_internal_amount_cols[row]; col++) {
-			session->_internal_window_positions[row][col] =
-				(wi_position) { 0, 0 };
+			window = session->windows[row][col];
+
+			if (window->size.is_flex_width) {
+				flex_windows[amount_to_compute] = window;
+				amount_to_compute++;
+			} else if (window->size.is_perc_width) {
+				wiAssert(window->size.width.percentage_width >= 0 && window->size.width.percentage_width <= 100);
+				int width =
+					terminal_size.cols * window->size.width.percentage_width / 100;
+				window->_internal_rendered_width = width;
+				static_occupied_width += width;
+			} else {
+				int width = window->size.width.fixed_width;
+				window->_internal_rendered_width = width;
+				static_occupied_width += width;
+			}
 		}
+		/* TODO: do something with the flexis */
 	}
 
 	return session;
