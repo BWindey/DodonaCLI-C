@@ -18,6 +18,13 @@ typedef struct terminal_size {
 	int cols;
 } terminal_size;
 
+int min_int(int a, int b) {
+	if (a <= b) {
+		return a;
+	}
+	return b;
+}
+
 /* Get 1 key-press from the user */
 char get_char() {
 	char buf = 0;
@@ -118,7 +125,7 @@ wi_session* calculate_window_dimension(wi_session* session) {
 	int window_width;
 
 	int min_row_height = terminal_size.rows;
-	/* TODO: keep track of min sizes and assign the window positions */
+	int accumulated_min_row_height = 0;
 
 	/* Step 1: check how wide each window will be */
 	/* Step 2: assign max height to the windows */
@@ -130,26 +137,58 @@ wi_session* calculate_window_dimension(wi_session* session) {
 		wi_window* flex_windows[session->_internal_amount_cols[row]];
 		int amount_to_compute = 0;
 		int static_occupied_width = 0;
+		int sum_weights;
 
 		for (int col = 0; col < session->_internal_amount_cols[row]; col++) {
 			window = session->windows[row][col];
 
 			if (window->size.is_flex_width) {
 				flex_windows[amount_to_compute] = window;
+				sum_weights += window->size.width.flex_width_weight;
 				amount_to_compute++;
+
 			} else if (window->size.is_perc_width) {
-				wiAssert(window->size.width.percentage_width >= 0 && window->size.width.percentage_width <= 100);
+				wiAssert(window->size.width.percentage_width > 0 && window->size.width.percentage_width <= 100);
 				int width =
 					terminal_size.cols * window->size.width.percentage_width / 100;
 				window->_internal_rendered_width = width;
 				static_occupied_width += width;
+
 			} else {
 				int width = window->size.width.fixed_width;
 				window->_internal_rendered_width = width;
 				static_occupied_width += width;
 			}
+
+				/* TODO: update min_row_height and what not */
+			if (window->size.is_flex_height) {
+				/* TODO: */
+			} else if (window->size.is_perc_height) {
+				wiAssert(window->size.width.percentage_width > 0 && window->size.width.percentage_width <= 100);
+				int width = terminal_size.rows * window->size.height.percentage_height / 100;
+				width -= accumulated_min_row_height;
+				/* TODO: */
+
+			} else {
+				/* TODO: */
+			}
 		}
-		/* TODO: do something with the flexis */
+
+		/* Assing flexi windows their width */
+		int width_left = terminal_size.cols - static_occupied_width;
+	  	int to_distribute = width_left;
+		for (int i = 0; i < amount_to_compute; i++) {
+	  		int set_width = to_distribute * (flex_windows[i]->size.width.flex_width_weight / sum_weights);
+			flex_windows[i]->_internal_rendered_width = set_width;
+			width_left -= set_width;
+		}
+		wiAssert(width_left < amount_to_compute, "According to my calculations, this assertion should never happen.");
+		/* Distribute left-over width among the first few windows */
+		for (int i = 0; i < width_left; i++) {
+			flex_windows[i]->_internal_rendered_width += 1;
+		}
+
+		accumulated_min_row_height += min_row_height;
 	}
 
 	return session;
