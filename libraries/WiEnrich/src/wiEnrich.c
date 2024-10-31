@@ -21,11 +21,11 @@ struct patternStruct {
 
 /*
  * Find all [PATTERNS] and replace them with their ansi escape values.
- * Lots of assertions possible, look at the README for more info, 
+ * Lots of assertions possible, look at the README for more info,
  * and a list of possible PATTERNS.
- * This function returns a pointer to the same in-place-modified string for 
+ * This function returns a pointer to the same in-place-modified string for
  * ease of use, but remember to not pass a string literal to the function!
- * String literarls are read-only, so the function will seg-fault while 
+ * String literarls are read-only, so the function will seg-fault while
  * trying to modify the string in-place.
  * You can use strdup() to get around this issue.
  */
@@ -111,7 +111,7 @@ char* wiEnrich(char* msg) {
                 // Check if valid, and which, keyword
                 keyword_index = 0;
                 while (
-					strcmp(substring, patterns[keyword_index].pattern) != 0 
+					strcmp(substring, patterns[keyword_index].pattern) != 0
 					&& keyword_index < SUPPORTED_KEYWORDS
 				) {
                     keyword_index++;
@@ -125,7 +125,7 @@ char* wiEnrich(char* msg) {
                 // Don't allow closing nothing (due to in-place nature of this operation)
                 if (keyword_index == 0) {
                     wiAssert(
-						currently_open == true, 
+						currently_open == true,
 						"Not allowed to use [/] without previous pattern"
 					);
                     currently_open = false;
@@ -136,8 +136,8 @@ char* wiEnrich(char* msg) {
                 // Actually replace, when $NO_COLOR, only do bold, italic, ...
                 if (NO_COLOR == false || keyword_index < 6) {
                     strncpy(
-						msg + p_new, 
-						patterns[keyword_index].replacement, 
+						msg + p_new,
+						patterns[keyword_index].replacement,
 						patterns[keyword_index].replacement_length
 					);
                     p_ori += patterns[keyword_index].pattern_length - 1;
