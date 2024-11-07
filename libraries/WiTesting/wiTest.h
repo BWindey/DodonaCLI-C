@@ -44,7 +44,7 @@ static int wiFailedTests = 0;
 		_wiTest(#EXPECTED, #GOT, "%ld", got, __VA_ARGS__); \
 	} \
 }
- 
+
 #ifndef FLOAT_TOLERANCE
 #define FLOAT_TOLERANCE 1e-5
 #endif // !FLOAT_TOLERANCE
@@ -69,10 +69,10 @@ static int wiFailedTests = 0;
 		_wiTest(expectedStr, #GOT, "%s", gotStr, __VA_ARGS__); \
 	} \
 }
- 
+
 #define wiTestEnum(EXPECTED, GOT, enumToString, ...) \
 { \
-	if ((EXPECTED) != (GOT)) {\
+	if ((EXPECTED) != (GOT)) { \
 		_wiTest(enumToString(EXPECTED), #GOT, "%s", enumToString(GOT), __VA_ARGS__); \
 	} \
 }
@@ -95,10 +95,10 @@ static int wiFailedTests = 0;
 
 /*
  * A standard way to print the results.
- * 
+ *
  * char* testName: name of test used to print out the messages.
  */
-static inline void wiPrintResult(char* testName) {
+static void wiPrintResult(char* testName) {
 	if (wiFailedTests > 1) {
 		printf("%d %s tests \033[91mfailed\033[0m.\n\n", wiFailedTests, testName);
 
@@ -107,7 +107,7 @@ static inline void wiPrintResult(char* testName) {
 
 	} else {
 		printf(
-			"%c%s tests \033[92mpassed\033[0m.\n\n", 
+			"%c%s tests \033[92mpassed\033[0m.\n\n",
 			toupper(testName[0]),
 			&testName[1]
 		);
