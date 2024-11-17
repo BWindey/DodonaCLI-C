@@ -151,6 +151,10 @@ terminal_size get_terminal_size(const wi_session* session) {
 	};
 }
 
+void resolve_overlap(wi_session* session) {
+	session->title = "Hoiwodyw";
+}
+
 /*
  * Per row, calculate the rendered width for each window.
  * This only changes when the normal width is set to -1.
@@ -241,7 +245,19 @@ wi_session* calculate_window_dimension(wi_session* session) {
 		}
 
 		accumulated_min_row_height += min_row_height;
+
+		/* Step 3: assigning positions to each window */
+		int accumulated_width = 0;
+		for (int col = 0; col < session->_internal_amount_cols[row]; col++) {
+			window->_internal_position = (wi_position) {
+				.row = accumulated_width,
+				.col = accumulated_min_row_height
+			};
+			accumulated_width += window->_internal_rendered_width;
+		}
 	}
+
+	resolve_overlap(session);
 
 	return session;
 }
