@@ -64,15 +64,12 @@ typedef struct wi_size {
 		int fixed_width;
 		int percentage_width;
 		int flex_width_weight;
-	};
+	} width;
 	union wi_height {
 		int fixed_height;
 		int percentage_height;
 		int flex_height_weight;
-	};
-
-	union wi_height height;
-	union wi_width width;
+	} height;
 } wi_size;
 
 typedef struct wi_session wi_session;
@@ -108,6 +105,8 @@ typedef struct wi_window {
 	/* Only change this outside library code if you like debugging. */
 	int _internal_rendered_height;
 
+	/* Only change this outside library code if you like debugging. */
+	wi_position _internal_position;
 	/* Only change this outside library code if you like debugging. */
 	wi_position _internal_last_cursor_position;
 	/* Only change this outside library code if you like debugging. */
