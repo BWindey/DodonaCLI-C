@@ -77,18 +77,19 @@ int main(void)
 		(wi_position) { 0, 0 }
 	);
 
-	window01->width = 30;
-	window02->width = 40;
+	window01->size.width.fixed_width = 30;
+	window02->size.width.fixed_width = 40;
 
-	window11->width = -1;
-	window12->width = 30;
-	window13->width = -1;
+	window11->size.width.fixed_width = -1;
+	window12->size.width.fixed_width = 30;
+	window13->size.width.fixed_width = -1;
 
-	window11->height = 15;
-	window12->height = 15;
-	window13->height = 15;
+	window11->size.height.fixed_height = 15;
+	window12->size.height.fixed_height = 15;
+	window13->size.height.fixed_height = 15;
 
-	window20->width = -1;
+	window20->size.is_flex_width = true;
+	window20->size.width.flex_width_weight = 0;
 
 	session->full_screen = false;
 
