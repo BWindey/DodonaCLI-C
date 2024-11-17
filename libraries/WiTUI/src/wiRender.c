@@ -4,7 +4,7 @@
 #include <string.h>		/* strlen() */
 #include <sys/ioctl.h>	/* ioctl() */
 #include <termios.h>	/* tcgetattr(), tcsetattr() */
-#include <unistd.h>		/* read(), ICANON, ECHO, ... */
+#include <unistd.h>		/* read(), ICANON, ECHO, ..., STDIN/OUT-FILENO */
 
 #include "../../WiTesting/wiAssert.h" 	/* wiAssert() */
 
@@ -40,8 +40,8 @@ long get_cursor_row() {
 	old.c_cc[VTIME] = 0;
 	wiAssert(tcsetattr(0, TCSANOW, &old) >= 0, "tcsetattr ICANON");
 
-	write(stdout, command, sizeof(command));
-	read(stdin, buf, sizeof(buf));
+	write(STDOUT_FILENO, command, sizeof(command));
+	read(STDIN_FILENO, buf, sizeof(buf));
 
 	/* Set back to normal mode */
 	old.c_lflag |= ICANON;
@@ -163,7 +163,6 @@ wi_session* calculate_window_dimension(wi_session* session) {
 	const terminal_size terminal_size = get_terminal_size(session);
 
 	wi_window* window;
-	int window_width;
 
 	int accumulated_min_row_height = 0;
 
