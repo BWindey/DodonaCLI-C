@@ -25,12 +25,40 @@ int min_int(int a, int b) {
 	return b;
 }
 
+long get_cursor_row() {
+	char buf[8];
+	char command[] = "\033[6n";
+
+	struct termios old = {0};
+	/* Save old settings */
+	wiAssert(tcgetattr(0, &old) >= 0, "tcgetattr()");
+
+	/* Set to raw mode */
+	old.c_lflag &= ~ICANON;
+	old.c_lflag &= ~ECHO;
+	old.c_cc[VMIN] = 1;
+	old.c_cc[VTIME] = 0;
+	wiAssert(tcsetattr(0, TCSANOW, &old) >= 0, "tcsetattr ICANON");
+
+	write(stdout, command, sizeof(command));
+	read(stdin, buf, sizeof(buf));
+
+	/* Set back to normal mode */
+	old.c_lflag |= ICANON;
+	old.c_lflag |= ECHO;
+	wiAssert(tcsetattr(0, TCSADRAIN, &old) >= 0, "tcsetattr ~ICANON");
+
+	long current_line = strtol(&buf[2], NULL, 10);
+
+	return current_line;
+}
+
 /* Get 1 key-press from the user */
 char get_char() {
 	char buf = 0;
 	struct termios old = {0};
 	/* Save old settings */
-	wiAssert(tcgetattr(0, &old) >= 0, "tcsetattr()");
+	wiAssert(tcgetattr(0, &old) >= 0, "tcgetattr()");
 
 	/* Set to raw mode */
 	old.c_lflag &= ~ICANON;
@@ -104,10 +132,23 @@ void cursor_go_to_row(int row) {
  *
  * @returns: struct with current terminal size
  */
-terminal_size get_terminal_size() {
+terminal_size get_terminal_size(const wi_session* session) {
 	struct winsize max;
 	ioctl(0, TIOCGWINSZ, &max);
-	return (terminal_size) { max.ws_row, max.ws_col };
+
+	long current_line = 0;
+
+	if (!session->full_screen) {
+		current_line = get_cursor_row();
+		if (max.ws_row - current_line < 10) {
+			current_line = max.ws_row - 10;
+		}
+	}
+
+	return (terminal_size) {
+		.rows = max.ws_row - current_line,
+		.cols = max.ws_col
+	};
 }
 
 /*
@@ -119,12 +160,11 @@ terminal_size get_terminal_size() {
  * @returns: updated session
  */
 wi_session* calculate_window_dimension(wi_session* session) {
-	const terminal_size terminal_size = get_terminal_size();
+	const terminal_size terminal_size = get_terminal_size(session);
 
 	wi_window* window;
 	int window_width;
 
-	int min_row_height = terminal_size.rows;
 	int accumulated_min_row_height = 0;
 
 	/* Step 1: check how wide each window will be */
@@ -139,9 +179,12 @@ wi_session* calculate_window_dimension(wi_session* session) {
 		int static_occupied_width = 0;
 		int sum_weights;
 
+		int min_row_height = terminal_size.rows;
+
 		for (int col = 0; col < session->_internal_amount_cols[row]; col++) {
 			window = session->windows[row][col];
 
+			/* Width */
 			if (window->size.is_flex_width) {
 				flex_windows[amount_to_compute] = window;
 				sum_weights += window->size.width.flex_width_weight;
@@ -160,21 +203,31 @@ wi_session* calculate_window_dimension(wi_session* session) {
 				static_occupied_width += width;
 			}
 
-				/* TODO: update min_row_height and what not */
+			/* Height */
+			int height;
 			if (window->size.is_flex_height) {
-				/* TODO: */
+				window->_internal_rendered_height =
+					terminal_size.cols - accumulated_min_row_height;
+				/* This is a minimum that I decided on */
+				height = 2;
+
 			} else if (window->size.is_perc_height) {
-				wiAssert(window->size.width.percentage_width > 0 && window->size.width.percentage_width <= 100);
-				int width = terminal_size.rows * window->size.height.percentage_height / 100;
-				width -= accumulated_min_row_height;
-				/* TODO: */
+				wiAssert(window->size.height.percentage_height > 0 && window->size.height.percentage_height <= 100);
+				height =
+					terminal_size.rows * window->size.height.percentage_height / 100;
+				height -= accumulated_min_row_height;
+				window->_internal_rendered_height = height;
 
 			} else {
-				/* TODO: */
+				height = window->size.width.fixed_width;
+				window->_internal_rendered_height = height;
+			}
+			if (height < min_row_height) {
+				min_row_height = height;
 			}
 		}
 
-		/* Assing flexi windows their width */
+		/* Assign flexi windows their width */
 		int width_left = terminal_size.cols - static_occupied_width;
 	  	int to_distribute = width_left;
 		for (int i = 0; i < amount_to_compute; i++) {
