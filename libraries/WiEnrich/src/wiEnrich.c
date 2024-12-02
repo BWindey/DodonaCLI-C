@@ -13,7 +13,7 @@
 
 struct patternStruct {
     char pattern[18]; 		/* Longest pattern + '\0' */
-    char replacement[7];	/* Longest replacement + '\0' */
+    char replacement[8];	/* Longest replacement + '\0' */
     int pattern_length;		/* Pattern length, including [] */
     int replacement_length;
 };
