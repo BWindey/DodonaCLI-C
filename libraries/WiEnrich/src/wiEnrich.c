@@ -6,7 +6,7 @@
 #include "../include/wiEnrich.h"
 #include "../../WiTesting/wiAssert.h"
 
-/* [/] is smallest pattern to search for, next smallest is [FRED] */
+/* [/] is smallest pattern to search for, next smallest is [DIM] */
 #define MIN_PATTERN_LENGTH 3
 #define SUPPORTED_KEYWORDS 38
 
