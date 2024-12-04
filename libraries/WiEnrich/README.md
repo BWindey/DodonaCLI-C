@@ -1,6 +1,6 @@
 # wiEnrich library
 > [!WARNING]
-> For technical reasons, [RED] is not a valid keyword, use [FRED]!
+> For technical reasons, `[RED]` is not a valid keyword, use `[FRED]`!
 
 This is a C-library that allows you to write text like:
 ```
