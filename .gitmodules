@@ -1,0 +1,12 @@
+[submodule "libraries/WiEnrich"]
+	path = libraries/WiEnrich
+	url = git@github.com:BWindey/WiEnrich.git
+[submodule "libraries/WiTesting"]
+	path = libraries/WiTesting
+	url = git@github.com:BWindey/WiTesting.git
+[submodule "libraries/WiJSON"]
+	path = libraries/WiJSON
+	url = git@github.com:BWindey/WiJSON.git
+[submodule "libraries/WiTUI"]
+	path = libraries/WiTUI
+	url = git@github.com:BWindey/WiTUI.git
